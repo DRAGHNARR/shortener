@@ -7,8 +7,6 @@ import (
 	"shortener/internal/utils"
 )
 
-const holder = "storage.csv"
-
 func App() {
 	/*
 		st, err := storage.New(holder)
