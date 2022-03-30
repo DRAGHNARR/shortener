@@ -1,13 +1,10 @@
 package handlers
 
 import (
-	"encoding/json"
-	"fmt"
 	"io"
 	"log"
 	"net/http"
 	"shortener/internal/storage"
-	"shortener/internal/utils"
 )
 
 type ShortHandler struct {
@@ -55,7 +52,7 @@ func (handler ShortHandler) Post(writer http.ResponseWriter, request *http.Reque
 		handler.Error(writer, err)
 		return
 	}
-	body := struct {
+	/*body := struct {
 		URL string `json:"url"`
 	}{}
 	err = json.Unmarshal(jbody, &body)
@@ -75,7 +72,7 @@ func (handler ShortHandler) Post(writer http.ResponseWriter, request *http.Reque
 	if err != nil {
 		handler.Error(writer, err)
 		return
-	}
+	} */
 
 	writer.WriteHeader(http.StatusCreated)
 	writer.Write(jbody)
