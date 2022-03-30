@@ -1,14 +1,14 @@
 package handlers
 
 import (
-	"../storage"
-	"../utils"
 	"fmt"
 	"github.com/stretchr/testify/assert"
 	"io"
 	"net/http"
 	"net/http/httptest"
 	"os"
+	"shortener/internal/storage"
+	"shortener/internal/utils"
 	"strings"
 	"testing"
 )
