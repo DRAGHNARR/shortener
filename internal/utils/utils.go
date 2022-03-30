@@ -29,5 +29,5 @@ func Shotifier(st *storage.Storage, input string) (string, error) {
 		}
 	}
 
-	return "", fmt.Errorf("Cannot shortify URL %s", input)
+	return "", fmt.Errorf("cannot shortify URL %s", input)
 }

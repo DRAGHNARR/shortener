@@ -13,7 +13,7 @@ import (
 	"testing"
 )
 
-const message = "Wanted: %v, got: %v"
+const message = "wanted: %v, got: %v"
 const holder = "./storage_test.csv"
 
 func TestShortHandler_Get(t *testing.T) {
@@ -47,8 +47,9 @@ func TestShortHandler_Get(t *testing.T) {
 	st, _ := storage.New(holder)
 	defer func() {
 		if err := st.File.Close(); err != nil {
-			assert.Errorf(t, err, "Cannot close test storage")
+			assert.Errorf(t, err, "cannot close test storage")
 		}
+		os.Remove(holder)
 	}()
 	utils.Shotifier(st, "http://exists.io")
 
@@ -59,11 +60,7 @@ func TestShortHandler_Get(t *testing.T) {
 			handler := http.Handler(New(st))
 			handler.ServeHTTP(writer, request)
 			result := writer.Result()
-			defer func() {
-				if err := result.Body.Close(); err != nil {
-					assert.Errorf(t, err, "Cannot close response body")
-				}
-			}()
+			defer result.Body.Close()
 
 			if result.StatusCode != test.want.code {
 				t.Errorf(message, result.StatusCode, test.want.code)
@@ -74,11 +71,6 @@ func TestShortHandler_Get(t *testing.T) {
 			}
 		})
 	}
-
-	if err := st.File.Close(); err != nil {
-		assert.Errorf(t, err, "Cannot close test storage")
-	}
-	os.Remove(holder)
 }
 
 func TestShortHandler_Post(t *testing.T) {
@@ -112,8 +104,9 @@ func TestShortHandler_Post(t *testing.T) {
 	st, _ := storage.New(holder)
 	defer func() {
 		if err := st.File.Close(); err != nil {
-			assert.Errorf(t, err, "Cannot close test storage")
+			assert.Errorf(t, err, "cannot close test storage")
 		}
+		os.Remove(holder)
 	}()
 
 	for _, test := range tests {
@@ -123,28 +116,15 @@ func TestShortHandler_Post(t *testing.T) {
 			handler := http.Handler(New(st))
 			handler.ServeHTTP(writer, request)
 			result := writer.Result()
-			defer func() {
-				if err := result.Body.Close(); err != nil {
-					assert.Errorf(t, err, "Cannot close response body")
-				}
-			}()
+			defer result.Body.Close()
 
 			if body, _ := io.ReadAll(result.Body); assert.NotNil(t, body) {
-				defer func() {
-					if err := result.Body.Close(); err != nil {
-						assert.Errorf(t, err, "Cannot close result body of test %s", test.name)
-					}
-				}()
+				defer result.Body.Close()
 				assert.JSONEqf(t, test.want.body, string(body), message, test.want.body, string(body))
 				assert.Equal(t, result.StatusCode, http.StatusOK, message, test.want.code, http.StatusOK)
 			}
 		})
 	}
-
-	if err := st.File.Close(); err != nil {
-		assert.Errorf(t, err, "Cannot close test storage")
-	}
-	os.Remove(holder)
 }
 
 func TestShortHandler_UnexpectedHTTPMethod(t *testing.T) {
@@ -168,8 +148,9 @@ func TestShortHandler_UnexpectedHTTPMethod(t *testing.T) {
 	st, _ := storage.New(holder)
 	defer func() {
 		if err := st.File.Close(); err != nil {
-			assert.Errorf(t, err, "Cannot close test storage")
+			assert.Errorf(t, err, "cannot close test storage")
 		}
+		os.Remove(holder)
 	}()
 
 	for _, test := range tests {
@@ -179,18 +160,9 @@ func TestShortHandler_UnexpectedHTTPMethod(t *testing.T) {
 			handler := http.Handler(New(st))
 			handler.ServeHTTP(writer, request)
 			result := writer.Result()
-			defer func() {
-				if err := result.Body.Close(); err != nil {
-					assert.Errorf(t, err, "Cannot close response body")
-				}
-			}()
+			defer result.Body.Close()
 
 			assert.Equal(t, result.StatusCode, test.want, message, result.StatusCode, test.want)
 		})
 	}
-
-	if err := st.File.Close(); err != nil {
-		assert.Errorf(t, err, "Cannot close test storage")
-	}
-	os.Remove(holder)
 }
