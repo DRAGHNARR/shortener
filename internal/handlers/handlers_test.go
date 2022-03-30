@@ -80,7 +80,7 @@ func TestShortHandler_Post(t *testing.T) {
 			value: "http://exists.io",
 			want: want{
 				code: http.StatusCreated,
-				body: `{"url": "localhost:8080/15a9c59"}`,
+				body: "localhost:8080/15a9c59",
 			},
 		},
 		{
@@ -88,7 +88,7 @@ func TestShortHandler_Post(t *testing.T) {
 			value: "http://exists.io",
 			want: want{
 				code: http.StatusCreated,
-				body: `{"url": "localhost:8080/15a9c59"}`,
+				body: "localhost:8080/15a9c59",
 			},
 		},
 	}
@@ -106,7 +106,7 @@ func TestShortHandler_Post(t *testing.T) {
 
 			if body, _ := io.ReadAll(result.Body); assert.NotNil(t, body) {
 				defer result.Body.Close()
-				assert.JSONEqf(t, test.want.body, string(body), message, test.want.body, string(body))
+				assert.Equal(t, test.want.body, string(body), message, test.want.body, string(body))
 				assert.Equal(t, test.want.code, result.StatusCode, message, result.StatusCode, test.want.code)
 			}
 		})

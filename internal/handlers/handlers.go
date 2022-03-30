@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"encoding/json"
 	"fmt"
 	"io"
 	"log"
@@ -65,18 +64,7 @@ func (handler ShortHandler) Post(writer http.ResponseWriter, request *http.Reque
 		handler.Error(writer, err)
 		return
 	}
-	body := struct {
-		URL string `json:"url"`
-	}{
-		URL: fmt.Sprintf("%s/%s", utils.Host, short),
-	}
-
-	jbody, err := json.Marshal(body)
-	if err != nil {
-		handler.Error(writer, err)
-		return
-	}
 
 	writer.WriteHeader(http.StatusCreated)
-	writer.Write(jbody)
+	writer.Write([]byte(fmt.Sprintf("%s/%s", utils.Host, short)))
 }
