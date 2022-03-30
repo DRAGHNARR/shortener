@@ -7,7 +7,7 @@ import (
 	"shortener/internal/storage"
 )
 
-const Host = "http://localhost:8080"
+const Host = "localhost:8080"
 
 func Shotifier(st storage.Storage, input string) (string, error) {
 	hash := md5.Sum([]byte(input))
