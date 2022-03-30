@@ -59,6 +59,11 @@ func TestShortHandler_Get(t *testing.T) {
 			handler := http.Handler(New(st))
 			handler.ServeHTTP(writer, request)
 			result := writer.Result()
+			defer func() {
+				if err := result.Body.Close(); err != nil {
+					assert.Errorf(t, err, "Cannot close response body")
+				}
+			}()
 
 			if result.StatusCode != test.want.code {
 				t.Errorf(message, result.StatusCode, test.want.code)
@@ -118,6 +123,11 @@ func TestShortHandler_Post(t *testing.T) {
 			handler := http.Handler(New(st))
 			handler.ServeHTTP(writer, request)
 			result := writer.Result()
+			defer func() {
+				if err := result.Body.Close(); err != nil {
+					assert.Errorf(t, err, "Cannot close response body")
+				}
+			}()
 
 			if body, _ := io.ReadAll(result.Body); assert.NotNil(t, body) {
 				defer func() {
@@ -169,6 +179,11 @@ func TestShortHandler_UnexpectedHTTPMethod(t *testing.T) {
 			handler := http.Handler(New(st))
 			handler.ServeHTTP(writer, request)
 			result := writer.Result()
+			defer func() {
+				if err := result.Body.Close(); err != nil {
+					assert.Errorf(t, err, "Cannot close response body")
+				}
+			}()
 
 			assert.Equal(t, result.StatusCode, test.want, message, result.StatusCode, test.want)
 		})
