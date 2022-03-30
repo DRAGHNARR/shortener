@@ -21,7 +21,7 @@ func New(st storage.Storage) ShortHandler {
 }
 
 func (handler ShortHandler) Error(writer http.ResponseWriter, err error) {
-	log.Fatalf("warn:> %s\n", err.Error())
+	log.Printf("warn:> %s\n", err.Error())
 	http.Error(writer, err.Error(), http.StatusFailedDependency) //http.StatusInternalServerError)
 }
 
@@ -50,28 +50,28 @@ func (handler ShortHandler) Get(writer http.ResponseWriter, request *http.Reques
 }
 
 func (handler ShortHandler) Post(writer http.ResponseWriter, request *http.Request) {
-	jbody, err := io.ReadAll(request.Body)
+	defer func() {
+		if err := request.Body.Close(); err != nil {
+			log.Printf("warn> %s\n", err.Error())
+		}
+	}()
+	original, err := io.ReadAll(request.Body)
+	if err != nil {
+		handler.Error(writer, err)
+		return
+	}
+	short, err := utils.Shotifier(handler.st, string(original))
 	if err != nil {
 		handler.Error(writer, err)
 		return
 	}
 	body := struct {
 		URL string `json:"url"`
-	}{}
-	err = json.Unmarshal(jbody, &body)
-	if err != nil {
-		handler.Error(writer, err)
-		return
+	}{
+		URL: fmt.Sprintf("%s/%s", utils.Host, short),
 	}
 
-	short, err := utils.Shotifier(handler.st, body.URL)
-	if err != nil {
-		handler.Error(writer, err)
-		return
-	}
-	body.URL = fmt.Sprintf("%s/%s", utils.Host, short)
-
-	jbody, err = json.Marshal(body)
+	jbody, err := json.Marshal(body)
 	if err != nil {
 		handler.Error(writer, err)
 		return
