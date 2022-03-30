@@ -97,7 +97,7 @@ func TestShortHandler_Post(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			request := httptest.NewRequest(http.MethodPost, "/", strings.NewReader(fmt.Sprintf(`{"url": "%v"}`, test.value)))
+			request := httptest.NewRequest(http.MethodPost, "/", strings.NewReader(test.value))
 			writer := httptest.NewRecorder()
 			handler := http.Handler(New(st))
 			handler.ServeHTTP(writer, request)

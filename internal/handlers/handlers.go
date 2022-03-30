@@ -22,7 +22,7 @@ func New(st storage.Storage) ShortHandler {
 
 func (handler ShortHandler) Error(writer http.ResponseWriter, err error) {
 	log.Printf("warn:> %s\n", err.Error())
-	http.Error(writer, err.Error(), http.StatusFailedDependency) //http.StatusInternalServerError)
+	http.Error(writer, err.Error(), http.StatusInternalServerError)
 }
 
 func (handler ShortHandler) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
