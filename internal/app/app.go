@@ -1,11 +1,11 @@
 package app
 
 import (
-	"../handlers"
-	"../storage"
-	"../utils"
 	"log"
 	"net/http"
+	"shortener/internal/handlers"
+	"shortener/internal/storage"
+	"shortener/internal/utils"
 )
 
 const holder = "storage.csv"

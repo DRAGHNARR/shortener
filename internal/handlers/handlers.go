@@ -1,13 +1,13 @@
 package handlers
 
 import (
-	"../storage"
-	"../utils"
 	"encoding/json"
 	"fmt"
 	"io"
 	"log"
 	"net/http"
+	"shortener/internal/storage"
+	"shortener/internal/utils"
 )
 
 type ShortHandler struct {

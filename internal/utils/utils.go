@@ -1,10 +1,10 @@
 package utils
 
 import (
-	"../storage"
 	"crypto/md5"
 	"encoding/hex"
 	"fmt"
+	"shortener/internal/storage"
 )
 
 const Host = "localhost:8080"
