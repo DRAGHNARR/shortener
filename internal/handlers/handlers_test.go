@@ -87,7 +87,7 @@ func TestShortHandler_Post(t *testing.T) {
 			name:  "positive #1 - not exists",
 			value: "http://exists.io",
 			want: want{
-				code: http.StatusOK,
+				code: http.StatusCreated,
 				body: `{"url": "localhost:8080/15a9c59"}`,
 			},
 		},
@@ -95,7 +95,7 @@ func TestShortHandler_Post(t *testing.T) {
 			name:  "positive #2 - exists",
 			value: "http://exists.io",
 			want: want{
-				code: http.StatusOK,
+				code: http.StatusCreated,
 				body: `{"url": "localhost:8080/15a9c59"}`,
 			},
 		},
@@ -121,7 +121,7 @@ func TestShortHandler_Post(t *testing.T) {
 			if body, _ := io.ReadAll(result.Body); assert.NotNil(t, body) {
 				defer result.Body.Close()
 				assert.JSONEqf(t, test.want.body, string(body), message, test.want.body, string(body))
-				assert.Equal(t, result.StatusCode, http.StatusOK, message, test.want.code, http.StatusOK)
+				assert.Equal(t, test.want.code, result.StatusCode, message, result.StatusCode, test.want.code)
 			}
 		})
 	}
@@ -162,7 +162,7 @@ func TestShortHandler_UnexpectedHTTPMethod(t *testing.T) {
 			result := writer.Result()
 			defer result.Body.Close()
 
-			assert.Equal(t, result.StatusCode, test.want, message, result.StatusCode, test.want)
+			assert.Equal(t, test.want, result.StatusCode, message, result.StatusCode, test.want)
 		})
 	}
 }
