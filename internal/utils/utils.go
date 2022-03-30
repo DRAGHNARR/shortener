@@ -9,14 +9,14 @@ import (
 
 const Host = "localhost:8080"
 
-func Shotifier(st *storage.Storage, input string) (string, error) {
+func Shotifier(st storage.Storage, input string) (string, error) {
 	hash := md5.Sum([]byte(input))
 	stringified := hex.EncodeToString(hash[:])
 
 	for i := 0; i < len(stringified)-7; i++ {
 		short := stringified[i : i+7]
 
-		orig, ok := st.Map[short]
+		orig, ok := st[short]
 
 		switch {
 		case !ok:

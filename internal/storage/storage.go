@@ -1,12 +1,16 @@
 package storage
 
-import (
-	"bufio"
-	"fmt"
-	"os"
-	"strings"
-)
+type Storage map[string]string
 
+func New() Storage {
+	return Storage{}
+}
+
+func (st Storage) Append(key, value string) {
+	st[key] = value
+}
+
+/*
 type Storage struct {
 	File *os.File
 	Map  map[string]string
@@ -44,3 +48,4 @@ func (st *Storage) Append(key, value string) error {
 
 	return nil
 }
+*/

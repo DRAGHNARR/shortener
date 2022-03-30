@@ -1,17 +1,20 @@
 package handlers
 
 import (
+	"encoding/json"
+	"fmt"
 	"io"
 	"log"
 	"net/http"
 	"shortener/internal/storage"
+	"shortener/internal/utils"
 )
 
 type ShortHandler struct {
-	st *storage.Storage
+	st storage.Storage
 }
 
-func New(st *storage.Storage) ShortHandler {
+func New(st storage.Storage) ShortHandler {
 	return ShortHandler{
 		st: st,
 	}
@@ -37,7 +40,7 @@ func (handler ShortHandler) ServeHTTP(writer http.ResponseWriter, request *http.
 }
 
 func (handler ShortHandler) Get(writer http.ResponseWriter, request *http.Request) {
-	if original, ok := handler.st.Map[request.URL.Path[1:]]; ok {
+	if original, ok := handler.st[request.URL.Path[1:]]; ok {
 		writer.Header().Set("Location", original)
 		writer.WriteHeader(http.StatusTemporaryRedirect)
 	} else {
@@ -52,7 +55,7 @@ func (handler ShortHandler) Post(writer http.ResponseWriter, request *http.Reque
 		handler.Error(writer, err)
 		return
 	}
-	/*body := struct {
+	body := struct {
 		URL string `json:"url"`
 	}{}
 	err = json.Unmarshal(jbody, &body)
@@ -72,7 +75,7 @@ func (handler ShortHandler) Post(writer http.ResponseWriter, request *http.Reque
 	if err != nil {
 		handler.Error(writer, err)
 		return
-	} */
+	}
 
 	writer.WriteHeader(http.StatusCreated)
 	writer.Write(jbody)
