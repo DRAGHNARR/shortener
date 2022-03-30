@@ -77,6 +77,6 @@ func (handler ShortHandler) Post(writer http.ResponseWriter, request *http.Reque
 		return
 	}
 
-	writer.WriteHeader(http.StatusOK)
+	writer.WriteHeader(http.StatusCreated)
 	writer.Write(jbody)
 }
