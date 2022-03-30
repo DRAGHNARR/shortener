@@ -5,15 +5,15 @@ import (
 	"io"
 	"log"
 	"net/http"
-	"shortener/internal/storage"
 	"shortener/internal/utils"
+	"sync"
 )
 
 type ShortHandler struct {
-	st storage.Storage
+	st *sync.Map
 }
 
-func New(st storage.Storage) ShortHandler {
+func New(st *sync.Map) ShortHandler {
 	return ShortHandler{
 		st: st,
 	}
@@ -39,8 +39,8 @@ func (handler ShortHandler) ServeHTTP(writer http.ResponseWriter, request *http.
 }
 
 func (handler ShortHandler) Get(writer http.ResponseWriter, request *http.Request) {
-	if original, ok := handler.st[request.URL.Path[1:]]; ok {
-		writer.Header().Set("Location", original)
+	if original, ok := handler.st.Load(request.URL.Path[1:]); ok {
+		writer.Header().Set("Location", original.(string))
 		writer.WriteHeader(http.StatusTemporaryRedirect)
 	} else {
 		writer.WriteHeader(http.StatusUnauthorized)
@@ -59,6 +59,7 @@ func (handler ShortHandler) Post(writer http.ResponseWriter, request *http.Reque
 		handler.Error(writer, err)
 		return
 	}
+
 	short, err := utils.Shotifier(handler.st, string(original))
 	if err != nil {
 		handler.Error(writer, err)

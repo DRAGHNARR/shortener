@@ -6,9 +6,9 @@ import (
 	"io"
 	"net/http"
 	"net/http/httptest"
-	"shortener/internal/storage"
 	"shortener/internal/utils"
 	"strings"
+	"sync"
 	"testing"
 )
 
@@ -42,14 +42,14 @@ func TestShortHandler_Get(t *testing.T) {
 		},
 	}
 
-	st := storage.New()
-	utils.Shotifier(st, "http://exists.io")
+	st := sync.Map{}
+	utils.Shotifier(&st, "http://exists.io")
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			request := httptest.NewRequest(http.MethodGet, fmt.Sprintf("/%s", test.value), nil)
 			writer := httptest.NewRecorder()
-			handler := http.Handler(New(st))
+			handler := http.Handler(New(&st))
 			handler.ServeHTTP(writer, request)
 			result := writer.Result()
 			defer result.Body.Close()
@@ -93,13 +93,13 @@ func TestShortHandler_Post(t *testing.T) {
 		},
 	}
 
-	st := storage.New()
+	st := sync.Map{}
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			request := httptest.NewRequest(http.MethodPost, "/", strings.NewReader(test.value))
 			writer := httptest.NewRecorder()
-			handler := http.Handler(New(st))
+			handler := http.Handler(New(&st))
 			handler.ServeHTTP(writer, request)
 			result := writer.Result()
 			defer result.Body.Close()
@@ -131,13 +131,13 @@ func TestShortHandler_UnexpectedHTTPMethod(t *testing.T) {
 		},
 	}
 
-	st := storage.New()
+	st := sync.Map{}
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			request := httptest.NewRequest(test.method, "/", nil)
 			writer := httptest.NewRecorder()
-			handler := http.Handler(New(st))
+			handler := http.Handler(New(&st))
 			handler.ServeHTTP(writer, request)
 			result := writer.Result()
 			defer result.Body.Close()
