@@ -80,7 +80,7 @@ func TestShortHandler_Post(t *testing.T) {
 			value: "http://exists.io",
 			want: want{
 				code: http.StatusCreated,
-				body: "localhost:8080/15a9c59",
+				body: "http://localhost:8080/15a9c59",
 			},
 		},
 		{
@@ -88,7 +88,7 @@ func TestShortHandler_Post(t *testing.T) {
 			value: "http://exists.io",
 			want: want{
 				code: http.StatusCreated,
-				body: "localhost:8080/15a9c59",
+				body: "http://localhost:8080/15a9c59",
 			},
 		},
 	}

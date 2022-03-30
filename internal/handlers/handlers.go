@@ -66,5 +66,5 @@ func (handler ShortHandler) Post(writer http.ResponseWriter, request *http.Reque
 	}
 
 	writer.WriteHeader(http.StatusCreated)
-	writer.Write([]byte(fmt.Sprintf("%s/%s", utils.Host, short)))
+	writer.Write([]byte(fmt.Sprintf("http://%s/%s", utils.Host, short)))
 }
