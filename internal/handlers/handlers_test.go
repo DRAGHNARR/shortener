@@ -6,7 +6,6 @@ import (
 	"io"
 	"net/http"
 	"net/http/httptest"
-	"os"
 	"shortener/internal/storage"
 	"shortener/internal/utils"
 	"strings"
@@ -14,7 +13,6 @@ import (
 )
 
 const message = "wanted: %v, got: %v"
-const holder = "./storage_test.csv"
 
 func TestShortHandler_Get(t *testing.T) {
 	type want struct {
@@ -44,13 +42,7 @@ func TestShortHandler_Get(t *testing.T) {
 		},
 	}
 
-	st, _ := storage.New(holder)
-	defer func() {
-		if err := st.File.Close(); err != nil {
-			assert.Errorf(t, err, "cannot close test storage")
-		}
-		os.Remove(holder)
-	}()
+	st := storage.New()
 	utils.Shotifier(st, "http://exists.io")
 
 	for _, test := range tests {
@@ -101,13 +93,7 @@ func TestShortHandler_Post(t *testing.T) {
 		},
 	}
 
-	st, _ := storage.New(holder)
-	defer func() {
-		if err := st.File.Close(); err != nil {
-			assert.Errorf(t, err, "cannot close test storage")
-		}
-		os.Remove(holder)
-	}()
+	st := storage.New()
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
@@ -145,13 +131,7 @@ func TestShortHandler_UnexpectedHTTPMethod(t *testing.T) {
 		},
 	}
 
-	st, _ := storage.New(holder)
-	defer func() {
-		if err := st.File.Close(); err != nil {
-			assert.Errorf(t, err, "cannot close test storage")
-		}
-		os.Remove(holder)
-	}()
+	st := storage.New()
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
