@@ -1,3 +1,7 @@
 package main
 
-func main() {}
+import "../../internal/app"
+
+func main() {
+	app.App()
+}
