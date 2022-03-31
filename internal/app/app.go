@@ -1,17 +1,28 @@
 package app
 
 import (
+	"log"
 	"net/http"
-	"shortener/internal/handlers"
-	"shortener/internal/utils"
-	"sync"
+
+	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
+
+	"shortener/internal/handler/catcher"
+	"shortener/internal/handler/shorty"
 )
 
 func App() {
-	st := sync.Map{}
+	e := echo.New()
+	e.Use(middleware.Logger())
+	e.Use(middleware.Recover())
+	e.HTTPErrorHandler = catcher.New().Catch
 
-	mux := http.NewServeMux()
-	mux.Handle("/", handlers.New(&st))
+	h := shorty.New()
 
-	http.ListenAndServe(utils.Host, mux)
+	e.GET("/:url", h.Get)
+	e.POST("/", h.Post)
+
+	if err := e.Start(":8080"); err != http.ErrServerClosed {
+		log.Fatalf("err> %s", err.Error())
+	}
 }
