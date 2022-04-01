@@ -3,7 +3,6 @@ package shorty
 import (
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 	"sync"
 
@@ -36,7 +35,7 @@ func (s *shorty) Get(c echo.Context) error {
 func (s *shorty) Post(c echo.Context) error {
 	defer func() {
 		if err := c.Request().Body.Close(); err != nil {
-			log.Printf("warn> %s\n", err.Error())
+			c.Logger().Error(err)
 		}
 	}()
 	orig, err := io.ReadAll(c.Request().Body)
