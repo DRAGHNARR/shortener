@@ -4,30 +4,29 @@ import (
 	"crypto/md5"
 	"encoding/hex"
 	"fmt"
-	"sync"
 )
 
 const Host = "localhost:8080"
 
-func Shotifier(box *sync.Map, input string) (string, error) {
-	hash := md5.Sum([]byte(input))
+func Shotifier(box *map[string]string, orig string) (string, bool, error) {
+	hash := md5.Sum([]byte(orig))
 	stringified := hex.EncodeToString(hash[:])
 
 	for i := 0; i < len(stringified)-7; i++ {
-		short := stringified[i : i+7]
+		shorty := stringified[i : i+7]
 
-		orig, ok := box.Load(short)
+		sOrig, ok := (*box)[shorty]
 
 		switch {
 		case !ok:
-			box.Store(short, input)
-			return short, nil
-		case orig == input:
-			return short, nil
+			(*box)[shorty] = orig
+			return shorty, true, nil
+		case sOrig == orig:
+			return shorty, false, nil
 		default:
 			continue
 		}
 	}
 
-	return "", fmt.Errorf("cannot shortify URL %s", input)
+	return "", false, fmt.Errorf("cannot shortify URL %s", orig)
 }
