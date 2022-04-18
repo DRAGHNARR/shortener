@@ -25,17 +25,19 @@ type config struct {
 }
 
 func App() {
-	c := &config{
-		port: "8080",
-	}
+	c := &config{}
 
-	if addr, ok := os.LookupEnv("SERVER_ADDRESS"); ok {
+	if addr, ok := os.LookupEnv("SERVER_HOST"); ok {
 		c.addr = addr
 	} else {
 		flag.StringVar(&c.addr, "a", "localhost", "port to listen on")
 	}
 
-	if store, ok := os.LookupEnv("FILE_STORAGE_PATH"); ok {
+	if port, ok := os.LookupEnv("SERVER_PORT"); ok {
+		c.port = port
+	}
+
+	if store, ok := os.LookupEnv("TEMP_FILE"); ok {
 		c.store = store
 	} else {
 		flag.StringVar(&c.store, "f", "test.json", "data storage")
