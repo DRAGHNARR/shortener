@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"shortener/internal/handler/zippo"
 	"strings"
 
 	"github.com/labstack/echo/v4"
@@ -68,14 +69,11 @@ func App() {
 		middleware.GzipConfig{
 			Level: gzip.BestCompression,
 			Skipper: func(c echo.Context) bool {
-				if strings.Contains(c.Request().Header.Get(echo.HeaderAcceptEncoding), "gzip") {
-					c.Response().Header().Del(echo.HeaderContentLength)
-					return false
-				}
-				return true
+				return !strings.Contains(c.Request().Header.Get(echo.HeaderAcceptEncoding), "gzip")
 			},
 		},
 	))
+	e.Use(zippo.DelContentLength())
 	e.HTTPErrorHandler = catcher.New().Catch
 
 	e.GET("/:url", h.Get)
