@@ -6,7 +6,6 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"shortener/internal/storage"
 	"strings"
 
 	"github.com/labstack/echo/v4"
@@ -14,6 +13,7 @@ import (
 
 	"shortener/internal/handler/catcher"
 	"shortener/internal/handler/shorty"
+	"shortener/internal/storage"
 )
 
 type config struct {
@@ -64,12 +64,22 @@ func App() {
 	e := echo.New()
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
-	e.Use(middleware.GzipWithConfig(middleware.GzipConfig{
-		Level: gzip.BestCompression,
-		Skipper: func(c echo.Context) bool {
-			return !strings.Contains(c.Request().Header.Get(echo.HeaderAcceptEncoding), "gzip")
+	e.Use(middleware.GzipWithConfig(
+		middleware.GzipConfig{
+			Level: gzip.BestCompression,
+			Skipper: func(c echo.Context) bool {
+				return !strings.Contains(c.Request().Header.Get("Accept-Encoding"), "gzip")
+			},
 		},
-	}))
+	))
+	e.Use(middleware.BodyLimitWithConfig(
+		middleware.BodyLimitConfig{
+			Limit: "2M",
+			Skipper: func(c echo.Context) bool {
+				return !strings.Contains(c.Request().Header.Get("Accept-Encoding"), "gzip")
+			},
+		},
+	))
 	e.HTTPErrorHandler = catcher.New().Catch
 
 	e.GET("/:url", h.Get)
