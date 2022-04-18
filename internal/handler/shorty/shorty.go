@@ -13,7 +13,7 @@ import (
 )
 
 type message struct {
-	Url    string `json:"url,omitempty"`
+	URL    string `json:"url,omitempty"`
 	Result string `json:"result,omitempty"`
 }
 
@@ -55,7 +55,7 @@ func (h *Shorty) GetPlain(c echo.Context) error {
 	return c.NoContent(http.StatusUnauthorized)
 }
 
-func (h *Shorty) GetJson(c echo.Context) error {
+func (h *Shorty) GetJSON(c echo.Context) error {
 	var m message
 	if err := json.NewDecoder(c.Request().Body).Decode(&m); err != nil {
 		return err
@@ -69,7 +69,7 @@ func (h *Shorty) GetJson(c echo.Context) error {
 	*/
 
 	var a message
-	if orig, ok := h.storage.Get(m.Url); ok {
+	if orig, ok := h.storage.Get(m.URL); ok {
 		a.Result = orig
 		body, err := json.Marshal(a)
 		if err != nil {
@@ -101,7 +101,7 @@ func (h *Shorty) PostPlain(c echo.Context) error {
 	return c.String(http.StatusCreated, fmt.Sprintf("%s/%s", h.base, shorty))
 }
 
-func (h *Shorty) PostJson(c echo.Context) error {
+func (h *Shorty) PostJSON(c echo.Context) error {
 	var m message
 	if err := json.NewDecoder(c.Request().Body).Decode(&m); err != nil {
 		return err
@@ -113,7 +113,7 @@ func (h *Shorty) PostJson(c echo.Context) error {
 			}
 		}()
 	*/
-	shorty, err := h.storage.Append(m.Url)
+	shorty, err := h.storage.Append(m.URL)
 	if err != nil {
 		return err
 	}
@@ -139,9 +139,13 @@ func (h *Shorty) Get(c echo.Context) error {
 	switch c.Request().Header.Get(echo.HeaderContentType) {
 	case echo.MIMEApplicationJSON:
 		c.Response().Header().Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
-		return h.GetJson(c)
+		return h.GetJSON(c)
 
 	case echo.MIMETextPlainCharsetUTF8:
+		c.Response().Header().Set(echo.HeaderContentType, echo.MIMETextPlainCharsetUTF8)
+		return h.GetPlain(c)
+
+	case "text/plain; charset=utf-8":
 		c.Response().Header().Set(echo.HeaderContentType, echo.MIMETextPlainCharsetUTF8)
 		return h.GetPlain(c)
 
@@ -168,9 +172,14 @@ func (h *Shorty) Post(c echo.Context) error {
 	case echo.MIMEApplicationJSON:
 		fmt.Println(123)
 		c.Response().Header().Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
-		return h.PostJson(c)
+		return h.PostJSON(c)
 
 	case echo.MIMETextPlainCharsetUTF8:
+		fmt.Println(123)
+		c.Response().Header().Set(echo.HeaderContentType, echo.MIMETextPlainCharsetUTF8)
+		return h.PostPlain(c)
+
+	case "text/plain; charset=utf-8":
 		fmt.Println(123)
 		c.Response().Header().Set(echo.HeaderContentType, echo.MIMETextPlainCharsetUTF8)
 		return h.PostPlain(c)
