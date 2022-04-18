@@ -58,23 +58,13 @@ func App() {
 	if base, ok := os.LookupEnv("BASE_URL"); ok {
 		c.base = base
 	} else {
-		flag.StringVar(&c.base, "b", "localhost", "base part of url")
+		flag.StringVar(&c.base, "b", "http://localhost:8080", "base part of url")
 	}
 	h := shorty.New(
 		s,
 		shorty.WithBase(fmt.Sprintf("%s:%s", c.base, c.port)),
 	)
 	flag.Parse()
-
-	fmt.Println("SH:")
-	fmt.Println(os.LookupEnv("SERVER_HOST"))
-	fmt.Println("SA:")
-	fmt.Println(os.LookupEnv("SERVER_ADDRESS"))
-	fmt.Println("SP:")
-	fmt.Println(os.LookupEnv("SERVER_PORT"))
-	fmt.Println("B:")
-	fmt.Println(os.LookupEnv("BASE_URL"))
-	fmt.Println(*c)
 
 	e := echo.New()
 	e.Use(middleware.Logger())

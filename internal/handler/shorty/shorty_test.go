@@ -49,7 +49,7 @@ func TestShorty_GetPlain(t *testing.T) {
 
 	h := New(
 		s,
-		WithBase("localhost:8080"),
+		WithBase("http://localhost:8080"),
 	)
 
 	for _, test := range tests {
@@ -111,7 +111,7 @@ func TestShorty_GetJson(t *testing.T) {
 
 	h := New(
 		s,
-		WithBase("http://localhost"),
+		WithBase("http://localhost:8080"),
 	)
 
 	for _, test := range tests {
@@ -262,7 +262,7 @@ func TestShorty_PostJson(t *testing.T) {
 
 	h := New(
 		s,
-		WithBase("localhost:8080"),
+		WithBase("http://localhost:8080"),
 	)
 
 	for _, test := range tests {
