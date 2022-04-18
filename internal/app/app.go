@@ -26,9 +26,23 @@ type config struct {
 func App() {
 	c := &config{}
 
-	flag.StringVar(&c.addr, "a", os.Getenv("SERVER_ADDRESS"), "host")
-	flag.StringVar(&c.store, "f", os.Getenv("FILE_STORAGE_PATH"), "data storage")
-	flag.StringVar(&c.base, "b", os.Getenv("BASE_URL"), "base part of url")
+	addr, ok := os.LookupEnv("SERVER_ADDRESS");
+	if !ok {
+		addr = "localhost:8080"
+	}
+	flag.StringVar(&c.addr, "a", addr, "host")
+
+	store, ok := os.LookupEnv("FILE_STORAGE_PATH")
+	if !ok {
+		store = "test.json"
+	}
+	flag.StringVar(&c.store, "f", store, "data storage")
+
+	base, ok := os.LookupEnv("BASE_URL")
+	if !ok {
+		base = "test.json"
+	}
+	flag.StringVar(&c.base, "b", base, "base part of url")
 	flag.Parse()
 
 	s := storage.New(
