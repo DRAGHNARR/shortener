@@ -27,7 +27,7 @@ type Shorty struct {
 func New(s *storage.Storage, opts ...option) *Shorty {
 	h := &Shorty{
 		storage: s,
-		base:    "http://localhost",
+		base:    "localhost:8080",
 	}
 
 	for _, opt := range opts {
@@ -119,7 +119,7 @@ func (h *Shorty) PostJSON(c echo.Context) error {
 	}
 
 	var a message
-	a.Result = fmt.Sprintf("http://%s/%s", h.base, shorty)
+	a.Result = fmt.Sprintf("http://%s:8080/%s", h.base, shorty)
 
 	body, err := json.Marshal(a)
 	if err != nil {
