@@ -85,7 +85,6 @@ func App() {
 	e.GET("/api/shorten", h.Get)
 	e.POST("/api/shorten", h.Post)
 
-	e.Host(c.addr)
 	if err := e.Start(c.addr); err != http.ErrServerClosed {
 		log.Fatalf("err> %s", err.Error())
 	}

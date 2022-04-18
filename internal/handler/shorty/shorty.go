@@ -150,7 +150,6 @@ func (h *Shorty) Get(c echo.Context) error {
 		return h.GetPlain(c)
 
 	default:
-		// return c.NoContent(http.StatusUnauthorized)
 		c.Response().Header().Set(echo.HeaderContentType, echo.MIMETextPlain)
 		return h.GetPlain(c)
 	}
@@ -170,7 +169,6 @@ func (h *Shorty) Post(c echo.Context) error {
 		return h.PostJSON(c)
 
 	case echo.MIMETextPlainCharsetUTF8:
-		fmt.Println(123)
 		c.Response().Header().Set(echo.HeaderContentType, echo.MIMETextPlainCharsetUTF8)
 		return h.PostPlain(c)
 
