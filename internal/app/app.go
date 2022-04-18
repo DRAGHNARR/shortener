@@ -42,7 +42,7 @@ func App() {
 		}
 	*/
 
-	if store, ok := os.LookupEnv("TEMP_FILE"); ok {
+	if store, ok := os.LookupEnv("FILE_STORAGE_PATH"); ok {
 		c.store = store
 	} else {
 		flag.StringVar(&c.store, "f", "test.json", "data storage")
