@@ -3,7 +3,6 @@ package app
 import (
 	"compress/gzip"
 	"flag"
-	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -18,26 +17,28 @@ import (
 )
 
 type config struct {
-	addr  string
-	base  string
-	port  string
+	addr string
+	base string
+	// port  string
 	store string
 }
 
 func App() {
 	c := &config{}
 
-	if addr, ok := os.LookupEnv("SERVER_HOST"); ok {
+	if addr, ok := os.LookupEnv("SERVER_ADDRESS"); ok {
 		c.addr = addr
 	} else {
-		flag.StringVar(&c.addr, "a", "localhost", "host")
+		flag.StringVar(&c.addr, "a", "http://localhost:8080", "host")
 	}
 
-	if port, ok := os.LookupEnv("SERVER_PORT"); ok {
-		c.port = port
-	} else {
-		flag.StringVar(&c.port, "p", "8080", "port")
-	}
+	/*
+		if port, ok := os.LookupEnv("SERVER_PORT"); ok {
+			c.port = port
+		} else {
+			flag.StringVar(&c.port, "p", "8080", "port")
+		}
+	*/
 
 	if store, ok := os.LookupEnv("TEMP_FILE"); ok {
 		c.store = store
@@ -62,7 +63,7 @@ func App() {
 	}
 	h := shorty.New(
 		s,
-		shorty.WithBase(fmt.Sprintf("%s:%s", c.base, c.port)),
+		shorty.WithBase(c.base),
 	)
 	flag.Parse()
 
@@ -82,7 +83,7 @@ func App() {
 	e.GET("/api/shorten", h.Get)
 	e.POST("/api/shorten", h.Post)
 
-	if err := e.Start(fmt.Sprintf("%s:%s", c.addr, c.port)); err != http.ErrServerClosed {
+	if err := e.Start(c.addr); err != http.ErrServerClosed {
 		log.Fatalf("err> %s", err.Error())
 	}
 }
