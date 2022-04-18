@@ -49,7 +49,7 @@ func TestShorty_GetPlain(t *testing.T) {
 
 	h := New(
 		s,
-		WithBase("http://localhost"),
+		WithBase("localhost:8080"),
 	)
 
 	for _, test := range tests {
@@ -69,7 +69,7 @@ func TestShorty_GetPlain(t *testing.T) {
 			}
 		})
 	}
-	
+
 	assert.NoError(t, s.File.Close(), "unexpected error")
 	assert.NoError(t, os.Remove("test.json"), "unexpected error")
 }
@@ -262,7 +262,7 @@ func TestShorty_PostJson(t *testing.T) {
 
 	h := New(
 		s,
-		WithBase("http://localhost:8080"),
+		WithBase("localhost:8080"),
 	)
 
 	for _, test := range tests {
