@@ -30,11 +30,13 @@ func App() {
 	if addr, ok := os.LookupEnv("SERVER_HOST"); ok {
 		c.addr = addr
 	} else {
-		flag.StringVar(&c.addr, "a", "localhost", "port to listen on")
+		flag.StringVar(&c.addr, "a", "localhost", "host")
 	}
 
 	if port, ok := os.LookupEnv("SERVER_PORT"); ok {
 		c.port = port
+	} else {
+		flag.StringVar(&c.port, "a", "8080", "port")
 	}
 
 	if store, ok := os.LookupEnv("TEMP_FILE"); ok {
