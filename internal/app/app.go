@@ -66,6 +66,14 @@ func App() {
 	)
 	flag.Parse()
 
+	fmt.Println("SH:")
+	fmt.Println(os.LookupEnv("SERVER_HOST"))
+	fmt.Println("SA:")
+	fmt.Println(os.LookupEnv("SERVER_ADDRESS"))
+	fmt.Println("SP:")
+	fmt.Println(os.LookupEnv("SERVER_PORT"))
+	fmt.Println("B:")
+	fmt.Println(os.LookupEnv("BASE_URL"))
 	fmt.Println(*c)
 
 	e := echo.New()
