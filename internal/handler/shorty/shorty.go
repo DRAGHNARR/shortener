@@ -163,9 +163,6 @@ func (h *Shorty) Post(c echo.Context) error {
 		}
 	}()
 
-	fmt.Println(c.Request().Header.Get(echo.HeaderContentType))
-	fmt.Println(echo.MIMETextPlainCharsetUTF8)
-
 	switch c.Request().Header.Get(echo.HeaderContentType) {
 	case echo.MIMEApplicationJSON:
 		fmt.Println(123)
@@ -173,11 +170,6 @@ func (h *Shorty) Post(c echo.Context) error {
 		return h.PostJSON(c)
 
 	case echo.MIMETextPlainCharsetUTF8:
-		fmt.Println(123)
-		c.Response().Header().Set(echo.HeaderContentType, echo.MIMETextPlainCharsetUTF8)
-		return h.PostPlain(c)
-
-	case "text/plain; charset=utf-8":
 		fmt.Println(123)
 		c.Response().Header().Set(echo.HeaderContentType, echo.MIMETextPlainCharsetUTF8)
 		return h.PostPlain(c)
