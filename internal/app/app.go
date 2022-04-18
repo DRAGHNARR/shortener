@@ -3,6 +3,7 @@ package app
 import (
 	"compress/gzip"
 	"flag"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -29,8 +30,9 @@ func App() {
 	if addr, ok := os.LookupEnv("SERVER_ADDRESS"); ok {
 		c.addr = addr
 	} else {
-		flag.StringVar(&c.addr, "a", "http://localhost:8080", "host")
+		flag.StringVar(&c.addr, "a", "localhost:8080", "host")
 	}
+	fmt.Println(c.addr)
 
 	/*
 		if port, ok := os.LookupEnv("SERVER_PORT"); ok {
@@ -83,6 +85,7 @@ func App() {
 	e.GET("/api/shorten", h.Get)
 	e.POST("/api/shorten", h.Post)
 
+	e.Host(c.addr)
 	if err := e.Start(c.addr); err != http.ErrServerClosed {
 		log.Fatalf("err> %s", err.Error())
 	}
