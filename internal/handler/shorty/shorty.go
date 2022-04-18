@@ -136,6 +136,8 @@ func (h *Shorty) Get(c echo.Context) error {
 		}
 	}()
 
+	fmt.Println(c.Request().Header)
+
 	switch c.Request().Header.Get(echo.HeaderContentType) {
 	case echo.MIMEApplicationJSON:
 		c.Response().Header().Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
