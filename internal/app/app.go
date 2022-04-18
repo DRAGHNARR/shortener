@@ -68,15 +68,11 @@ func App() {
 		middleware.GzipConfig{
 			Level: gzip.BestCompression,
 			Skipper: func(c echo.Context) bool {
-				return !strings.Contains(c.Request().Header.Get("Accept-Encoding"), "gzip")
-			},
-		},
-	))
-	e.Use(middleware.BodyLimitWithConfig(
-		middleware.BodyLimitConfig{
-			Limit: "2M",
-			Skipper: func(c echo.Context) bool {
-				return !strings.Contains(c.Request().Header.Get("Accept-Encoding"), "gzip")
+				if strings.Contains(c.Request().Header.Get(echo.HeaderAcceptEncoding), "gzip") {
+					c.Response().Header().Del(echo.HeaderContentLength)
+					return false
+				}
+				return true
 			},
 		},
 	))
