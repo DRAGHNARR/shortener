@@ -26,7 +26,7 @@ type config struct {
 func App() {
 	c := &config{}
 
-	addr, ok := os.LookupEnv("SERVER_ADDRESS");
+	addr, ok := os.LookupEnv("SERVER_ADDRESS")
 	if !ok {
 		addr = "localhost:8080"
 	}
@@ -40,7 +40,7 @@ func App() {
 
 	base, ok := os.LookupEnv("BASE_URL")
 	if !ok {
-		base = "test.json"
+		base = "http://localhost:8080"
 	}
 	flag.StringVar(&c.base, "b", base, "base part of url")
 	flag.Parse()
