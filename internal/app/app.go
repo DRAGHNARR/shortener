@@ -72,8 +72,8 @@ func App() {
 	e.Use(middleware.GzipWithConfig(middleware.GzipConfig{
 		Level: gzip.BestCompression,
 		Skipper: func(c echo.Context) bool {
-			fmt.Println(c.Request().Header.Get("Accept-Encoding"))
-			return !strings.Contains(c.Request().Header.Get("Accept-Encoding"), "gzip")
+			fmt.Println("middl:", c.Request().Header.Get(c.Request().Header.Get(echo.HeaderContentType)))
+			return !strings.Contains(c.Request().Header.Get(echo.HeaderAcceptEncoding), "gzip")
 		},
 	}))
 	e.HTTPErrorHandler = catcher.New().Catch
