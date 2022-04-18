@@ -98,7 +98,7 @@ func (h *Shorty) PostPlain(c echo.Context) error {
 		return err
 	}
 
-	return c.String(http.StatusCreated, fmt.Sprintf("%s/%s", h.base, shorty))
+	return c.String(http.StatusCreated, fmt.Sprintf("http://%s/%s", h.base, shorty))
 }
 
 func (h *Shorty) PostJSON(c echo.Context) error {
@@ -119,7 +119,7 @@ func (h *Shorty) PostJSON(c echo.Context) error {
 	}
 
 	var a message
-	a.Result = fmt.Sprintf("%s/%s", h.base, shorty)
+	a.Result = fmt.Sprintf("http://%s/%s", h.base, shorty)
 
 	body, err := json.Marshal(a)
 	if err != nil {

@@ -67,9 +67,6 @@ func WithFile(filename string) option {
 			s.Box[n.Shorty] = n.Orig
 		}
 
-		log.Println(scanner.Err())
-		log.Println(s.Box)
-
 		s.File = file
 		s.writer = bufio.NewWriter(s.File)
 		return nil

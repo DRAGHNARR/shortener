@@ -66,7 +66,7 @@ func App() {
 	)
 	flag.Parse()
 
-	fmt.Println(*c)
+	fmt.Println(*s)
 
 	e := echo.New()
 	e.Use(middleware.Logger())
