@@ -62,7 +62,7 @@ func App() {
 	}
 	h := shorty.New(
 		s,
-		shorty.WithBase(c.base),
+		shorty.WithBase(fmt.Sprintf("%s:%s", c.base, c.port)),
 	)
 	flag.Parse()
 
