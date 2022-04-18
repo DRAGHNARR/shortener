@@ -147,16 +147,14 @@ func (h *Shorty) Get(c echo.Context) error {
 		c.Response().Header().Set(echo.HeaderContentType, echo.MIMETextPlainCharsetUTF8)
 		return h.GetPlain(c)
 
-	case "text/plain; charset=utf-8":
-		c.Response().Header().Set(echo.HeaderContentType, echo.MIMETextPlainCharsetUTF8)
-		return h.GetPlain(c)
-
 	case echo.MIMETextPlain:
 		c.Response().Header().Set(echo.HeaderContentType, echo.MIMETextPlain)
 		return h.GetPlain(c)
 
 	default:
-		return c.NoContent(http.StatusUnauthorized)
+		// return c.NoContent(http.StatusUnauthorized)
+		c.Response().Header().Set(echo.HeaderContentType, echo.MIMETextPlainCharsetUTF8)
+		return h.GetPlain(c)
 	}
 }
 
