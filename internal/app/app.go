@@ -72,7 +72,6 @@ func App() {
 	e.Use(middleware.GzipWithConfig(middleware.GzipConfig{
 		Level: gzip.BestCompression,
 		Skipper: func(c echo.Context) bool {
-			fmt.Println("middl:", c.Request().Header.Get(c.Request().Header.Get(echo.HeaderContentType)))
 			return !strings.Contains(c.Request().Header.Get(echo.HeaderAcceptEncoding), "gzip")
 		},
 	}))
