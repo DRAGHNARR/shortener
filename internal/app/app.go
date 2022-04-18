@@ -36,7 +36,7 @@ func App() {
 	if port, ok := os.LookupEnv("SERVER_PORT"); ok {
 		c.port = port
 	} else {
-		flag.StringVar(&c.port, "a", "8080", "port")
+		flag.StringVar(&c.port, "p", "8080", "port")
 	}
 
 	if store, ok := os.LookupEnv("TEMP_FILE"); ok {
