@@ -1,15 +1,21 @@
 package zippo
 
 import (
+	"compress/gzip"
 	"fmt"
-	"github.com/labstack/echo/v4"
 	"io"
 	"strings"
+
+	"github.com/labstack/echo/v4"
 )
 
 type zippo struct {
 	echo.Context
-	writer io.Writer
+	Writer io.Writer
+}
+
+func (z *zippo) Write(b []byte) (int, error) {
+	return z.Writer.Write(b)
 }
 
 func ZippoWriter() echo.MiddlewareFunc {
@@ -20,26 +26,24 @@ func ZippoWriter() echo.MiddlewareFunc {
 			if !strings.Contains(c.Request().Header.Get(echo.HeaderAcceptEncoding), "gzip") {
 				return next(c)
 			}
-			/*
-				gz, err := gzip.NewWriterLevel(c.Response(), gzip.BestSpeed)
-				if err != nil {
-					return err
-				}
-				defer func() {
-					if err := gz.Close(); err != nil {
-						c.Logger().Error(err)
-					}
-				}()
 
-				c.Response().Header().Set(echo.HeaderContentEncoding, "gzip")
-				z := zippo{
-					c,
-					gz,
+			gz, err := gzip.NewWriterLevel(c.Response(), gzip.BestSpeed)
+			if err != nil {
+				return err
+			}
+			defer func() {
+				if err := gz.Close(); err != nil {
+					c.Logger().Error(err)
 				}
-			*/
+			}()
 
-			// return next(z)
-			return next(c)
+			c.Response().Header().Set(echo.HeaderContentEncoding, "gzip")
+			z := zippo{
+				c,
+				gz,
+			}
+
+			return next(z)
 		}
 	}
 }
