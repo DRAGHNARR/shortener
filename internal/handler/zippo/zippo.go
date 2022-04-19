@@ -42,7 +42,7 @@ func ZippoWriter() echo.MiddlewareFunc {
 			}
 			c.Response().Header().Set(echo.HeaderContentEncoding, "gzip")
 			c.Response().Header().Set(echo.HeaderVary, echo.HeaderContentEncoding)
-			c.Response().Header().Del(echo.HeaderContentLength) // wtf???
+			c.Response().Header().Del(echo.HeaderContentLength) // wtf??? check
 			fmt.Println("headers", c.Response().Header())
 
 			return next(c)
