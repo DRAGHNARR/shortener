@@ -108,7 +108,6 @@ func (s *Storage) Append(orig string) (string, error) {
 
 	if added && s.File != nil {
 		if err := s.store(orig, shorty); err != nil {
-			log.Println(err)
 			return "", err
 		}
 	}

@@ -2,11 +2,13 @@ package app
 
 import (
 	"flag"
-	"github.com/labstack/echo/v4"
-	"github.com/labstack/echo/v4/middleware"
 	"log"
 	"net/http"
 	"os"
+	
+	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
+
 	"shortener/internal/handler/catcher"
 	"shortener/internal/handler/shorty"
 	"shortener/internal/handler/zippo"

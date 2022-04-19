@@ -60,13 +60,6 @@ func (h *Shorty) GetJSON(c echo.Context) error {
 	if err := json.NewDecoder(c.Request().Body).Decode(&m); err != nil {
 		return err
 	}
-	/*
-		defer func() {
-			if err := c.Request().Body.Close(); err != nil {
-				log.Printf("cannot close request body, %s", err.Error())
-			}
-		}()
-	*/
 
 	var a message
 	if orig, ok := h.storage.Get(m.URL); ok {
@@ -82,13 +75,6 @@ func (h *Shorty) GetJSON(c echo.Context) error {
 
 func (h *Shorty) PostPlain(c echo.Context) error {
 	orig, err := io.ReadAll(c.Request().Body)
-	/*
-		defer func() {
-			if err := c.Request().Body.Close(); err != nil {
-				log.Printf("cannot close request body, %s", err.Error())
-			}
-		}()
-	*/
 	if err != nil {
 		return err
 	}
@@ -130,8 +116,6 @@ func (h *Shorty) Get(c echo.Context) error {
 		}
 	}()
 
-	fmt.Println(c.Request().Header)
-
 	switch c.Request().Header.Get(echo.HeaderContentType) {
 	case echo.MIMEApplicationJSON:
 		c.Response().Header().Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
@@ -167,13 +151,6 @@ func (h *Shorty) Post(c echo.Context) error {
 	case echo.MIMETextPlainCharsetUTF8:
 		c.Response().Header().Set(echo.HeaderContentType, echo.MIMETextPlainCharsetUTF8)
 		return h.PostPlain(c)
-
-		/*
-			case "text/plain; charset=utf-8":
-				fmt.Println(123)
-				c.Response().Header().Set(echo.HeaderContentType, echo.MIMETextPlainCharsetUTF8)
-				return h.PostPlain(c)
-		*/
 
 	case echo.MIMETextPlain:
 		c.Response().Header().Set(echo.HeaderContentType, echo.MIMETextPlain)
