@@ -106,13 +106,7 @@ func (h *Shorty) PostJSON(c echo.Context) error {
 	if err := json.NewDecoder(c.Request().Body).Decode(&m); err != nil {
 		return err
 	}
-	/*
-		defer func() {
-			if err := c.Request().Body.Close(); err != nil {
-				log.Printf("cannot close request body, %s", err.Error())
-			}
-		}()
-	*/
+
 	shorty, err := h.storage.Append(m.URL)
 	if err != nil {
 		return err

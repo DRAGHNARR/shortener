@@ -22,7 +22,6 @@ func (z zippo) Write(b []byte) (int, error) {
 func ZippoWriter() echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
-			fmt.Println(c.Request().Header)
 			if !strings.Contains(c.Request().Header.Get(echo.HeaderAcceptEncoding), "gzip") {
 				return next(c)
 			}
@@ -38,7 +37,7 @@ func ZippoWriter() echo.MiddlewareFunc {
 			}()
 
 			c.Response().Writer = zippo{
-				c.Response().Writer,
+				c.Response(),
 				gz,
 			}
 			c.Response().Header().Set(echo.HeaderContentEncoding, "gzip")

@@ -69,6 +69,7 @@ func App() {
 			},
 		},
 	)) */
+	// e.Use(zippo.ZippoReader())
 	e.Use(zippo.ZippoWriter())
 	e.HTTPErrorHandler = catcher.New().Catch
 
