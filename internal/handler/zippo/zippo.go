@@ -18,6 +18,27 @@ func (z zippo) Write(b []byte) (int, error) {
 	return z.Writer.Write(b)
 }
 
+func ZippoReader() echo.MiddlewareFunc {
+	return func(next echo.HandlerFunc) echo.HandlerFunc {
+		return func(c echo.Context) error {
+			if c.Request().Header.Get(echo.HeaderContentEncoding) != "gzip" {
+				return next(c)
+			}
+
+			gz, err := gzip.NewReader(c.Request().Body)
+			if err != nil {
+				return err
+			}
+			defer func() {
+				c.Logger().Error(gz.Close())
+			}()
+
+			c.Request().Body = gz
+			return next(c)
+		}
+	}
+}
+
 func ZippoWriter() echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
@@ -43,7 +64,6 @@ func ZippoWriter() echo.MiddlewareFunc {
 			c.Response().Header().Set(echo.HeaderVary, echo.HeaderAcceptEncoding)
 			//c.Response().Header().Set(echo.HeaderVary, echo.HeaderContentEncoding)
 			c.Response().Header().Del(echo.HeaderContentLength) // wtf??? check
-
 			return next(c)
 		}
 	}
