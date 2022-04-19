@@ -1,6 +1,7 @@
 package zippo
 
 import (
+	"fmt"
 	"github.com/labstack/echo/v4"
 	"io"
 	"strings"
@@ -14,6 +15,8 @@ type zippo struct {
 func ZippoWriter() echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
+			fmt.Println(c.Request().Header.Get(echo.HeaderAcceptEncoding))
+			fmt.Println(c.Response().Header().Get(echo.HeaderAcceptEncoding))
 			if !strings.Contains(c.Request().Header.Get(echo.HeaderAcceptEncoding), "gzip") {
 				return next(c)
 			}
