@@ -7,10 +7,9 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"shortener/internal/handler/zippo"
-
 	"shortener/internal/handler/catcher"
 	"shortener/internal/handler/shorty"
+	"shortener/internal/handler/zippo"
 	"shortener/internal/storage"
 )
 

@@ -2,7 +2,6 @@ package zippo
 
 import (
 	"compress/gzip"
-	"fmt"
 	"io"
 	"strings"
 
@@ -21,13 +20,13 @@ func (z *zippo) Write(b []byte) (int, error) {
 func ZippoWriter() echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
-			fmt.Println(c.Request().Header.Get(echo.HeaderAcceptEncoding))
-			fmt.Println(c.Response().Header().Get(echo.HeaderAcceptEncoding))
+			// fmt.Println(c.Request().Header.Get(echo.HeaderAcceptEncoding))
+			// fmt.Println(c.Response().Header().Get(echo.HeaderAcceptEncoding))
 			if !strings.Contains(c.Request().Header.Get(echo.HeaderAcceptEncoding), "gzip") {
 				return next(c)
 			}
 
-			gz, err := gzip.NewWriterLevel(c.Response(), gzip.BestSpeed)
+			gz, err := gzip.NewWriterLevel(c.Response().Writer, gzip.BestSpeed)
 			if err != nil {
 				return err
 			}
@@ -38,6 +37,8 @@ func ZippoWriter() echo.MiddlewareFunc {
 			}()
 
 			c.Response().Header().Set(echo.HeaderContentEncoding, "gzip")
+			c.Response().Header().Set(echo.HeaderVary, echo.HeaderContentEncoding)
+			c.Response().Header().Del(echo.HeaderContentLength)
 			z := zippo{
 				c,
 				gz,
