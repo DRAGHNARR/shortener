@@ -70,7 +70,7 @@ func App() {
 			},
 		},
 	)) */
-	e.Use(zippo.Zippo())
+	e.Use(zippo.ZippoWriter())
 	e.HTTPErrorHandler = catcher.New().Catch
 
 	e.GET("/:url", h.Get)
