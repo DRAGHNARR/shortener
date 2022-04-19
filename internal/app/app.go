@@ -67,13 +67,13 @@ func App() {
 	e.Use(middleware.Recover())
 	e.Use(middleware.GzipWithConfig(
 		middleware.GzipConfig{
-			Level: gzip.BestCompression,
+			Level: gzip.DefaultCompression,
 			Skipper: func(c echo.Context) bool {
 				return !strings.Contains(c.Request().Header.Get(echo.HeaderAcceptEncoding), "gzip")
 			},
 		},
 	))
-	e.Use(zippo.DelContentLength())
+	e.Use(zippo.Zippo())
 	e.HTTPErrorHandler = catcher.New().Catch
 
 	e.GET("/:url", h.Get)
