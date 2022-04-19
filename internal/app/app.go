@@ -1,16 +1,13 @@
 package app
 
 import (
-	"compress/gzip"
 	"flag"
+	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 	"log"
 	"net/http"
 	"os"
 	"shortener/internal/handler/zippo"
-	"strings"
-
-	"github.com/labstack/echo/v4"
-	"github.com/labstack/echo/v4/middleware"
 
 	"shortener/internal/handler/catcher"
 	"shortener/internal/handler/shorty"
@@ -65,14 +62,14 @@ func App() {
 	e := echo.New()
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
-	e.Use(middleware.GzipWithConfig(
+	/* e.Use(middleware.GzipWithConfig(
 		middleware.GzipConfig{
 			Level: gzip.DefaultCompression,
 			Skipper: func(c echo.Context) bool {
 				return !strings.Contains(c.Request().Header.Get(echo.HeaderAcceptEncoding), "gzip")
 			},
 		},
-	))
+	)) */
 	e.Use(zippo.Zippo())
 	e.HTTPErrorHandler = catcher.New().Catch
 
