@@ -61,6 +61,7 @@ func App() {
 	e := echo.New()
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
+	e.Use(zippo.ZippoReader())
 	e.Use(zippo.ZippoWriter())
 	e.HTTPErrorHandler = catcher.New().Catch
 
