@@ -2,7 +2,6 @@ package zippo
 
 import (
 	"compress/gzip"
-	"fmt"
 	"io"
 	"net/http"
 	"strings"
@@ -41,9 +40,9 @@ func ZippoWriter() echo.MiddlewareFunc {
 				gz,
 			}
 			c.Response().Header().Set(echo.HeaderContentEncoding, "gzip")
-			c.Response().Header().Set(echo.HeaderVary, echo.HeaderContentEncoding)
+			c.Response().Header().Set(echo.HeaderVary, echo.HeaderAcceptEncoding)
+			//c.Response().Header().Set(echo.HeaderVary, echo.HeaderContentEncoding)
 			c.Response().Header().Del(echo.HeaderContentLength) // wtf??? check
-			fmt.Println("headers", c.Response().Header())
 
 			return next(c)
 		}

@@ -61,15 +61,6 @@ func App() {
 	e := echo.New()
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
-	/* e.Use(middleware.GzipWithConfig(
-		middleware.GzipConfig{
-			Level: gzip.DefaultCompression,
-			Skipper: func(c echo.Context) bool {
-				return !strings.Contains(c.Request().Header.Get(echo.HeaderAcceptEncoding), "gzip")
-			},
-		},
-	)) */
-	// e.Use(zippo.ZippoReader())
 	e.Use(zippo.ZippoWriter())
 	e.HTTPErrorHandler = catcher.New().Catch
 
