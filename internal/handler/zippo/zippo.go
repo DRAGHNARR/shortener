@@ -37,7 +37,7 @@ func ZippoWriter() echo.MiddlewareFunc {
 			}()
 
 			c.Response().Writer = zippo{
-				c.Response(),
+				c.Response().Writer,
 				gz,
 			}
 			c.Response().Header().Set(echo.HeaderContentEncoding, "gzip")
