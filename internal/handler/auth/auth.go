@@ -46,6 +46,7 @@ func Check() echo.MiddlewareFunc {
 				cookie.Value = Sign(key, token)
 				cookie.Expires = time.Now().Add(7 * 24 * time.Hour)
 				cookie.Path = "/"
+				c.Request().AddCookie(cookie)
 				c.SetCookie(cookie)
 				return next(c)
 			}
