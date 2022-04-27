@@ -35,7 +35,7 @@ func Check() echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
 			auth, err := c.Request().Cookie("url-auth")
-			if err == http.ErrNoCookie || !Verify(key, auth.Value) {
+			if err != nil || !Verify(key, auth.Value) {
 				token := make([]byte, 4)
 				if _, err := rand.Read(token); err != nil {
 					c.Logger().Error(err)
