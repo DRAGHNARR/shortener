@@ -30,7 +30,7 @@ func TestStorage_AppendWithHolding(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			shorty, err := s.Append(test.value)
+			shorty, err := s.Append(test.value, "test")
 			if assert.NoError(t, err, fmt.Sprintf("%s: error handled", test.name)) {
 				assert.Equal(t, test.want, shorty, fmt.Sprintf("%s: unexpected result", test.name))
 				assert.Equal(t, test.value, s.Box[shorty], fmt.Sprintf("%s: unexpected result", test.name))
@@ -64,7 +64,7 @@ func TestStorage_AppendWithoutHolding(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			shorty, err := s.Append(test.value)
+			shorty, err := s.Append(test.value, "test")
 			if assert.NoError(t, err, fmt.Sprintf("%s: error handled", test.name)) {
 				assert.Equal(t, test.want, shorty, fmt.Sprintf("%s: unexpected result", test.name))
 				assert.Equal(t, test.value, s.Box[shorty], fmt.Sprintf("%s: unexpected result", test.name))

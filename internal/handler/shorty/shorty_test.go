@@ -44,7 +44,7 @@ func TestShorty_GetPlain(t *testing.T) {
 		storage.WithFile("test.json"),
 	)
 
-	_, err := s.Append("https://exists.io")
+	_, err := s.Append("https://exists.io", "test")
 	assert.NoError(t, err, "cannot append url to storage")
 
 	h := New(
@@ -106,7 +106,7 @@ func TestShorty_GetJson(t *testing.T) {
 		storage.WithFile("test.json"),
 	)
 
-	_, err := s.Append("https://exists.io")
+	_, err := s.Append("https://exists.io", "test")
 	assert.NoError(t, err, "cannot append url to storage")
 
 	h := New(
@@ -182,7 +182,7 @@ func TestShorty_PostPlain(t *testing.T) {
 		storage.WithFile("test.json"),
 	)
 
-	_, err := s.Append("https://exists.io")
+	_, err := s.Append("https://exists.io", "test")
 	assert.NoError(t, err, "cannot append url to storage")
 
 	h := New(
@@ -257,7 +257,7 @@ func TestShorty_PostJson(t *testing.T) {
 		storage.WithFile("test.json"),
 	)
 
-	_, err := s.Append("https://exists.io")
+	_, err := s.Append("https://exists.io", "test")
 	assert.NoError(t, err, "cannot append url to storage")
 
 	h := New(
