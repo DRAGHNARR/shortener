@@ -50,7 +50,7 @@ func App() {
 	if !ok {
 		dsn = ""
 	}
-	flag.StringVar(&c.dsn, "b", dsn, "base part of url")
+	flag.StringVar(&c.dsn, "d", dsn, "base part of url")
 	flag.Parse()
 
 	db, err := sql.Open("postgres", c.dsn)
