@@ -22,6 +22,7 @@ type config struct {
 	base string
 	// port  string
 	store string
+	dsn   string
 }
 
 func App() {
@@ -44,9 +45,15 @@ func App() {
 		base = "http://localhost:8080"
 	}
 	flag.StringVar(&c.base, "b", base, "base part of url")
+
+	dsn, ok := os.LookupEnv("DATABASE_DSN")
+	if !ok {
+		dsn = ""
+	}
+	flag.StringVar(&c.dsn, "b", dsn, "base part of url")
 	flag.Parse()
 
-	db, err := sql.Open("postgres", "")
+	db, err := sql.Open("postgres", c.dsn)
 	if err != nil {
 		log.Fatalln(err)
 	}
