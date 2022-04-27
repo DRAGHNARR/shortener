@@ -8,6 +8,12 @@ import (
 
 const Host = "localhost:8080"
 
+type Node struct {
+	Shorty string `json:"shorty"`
+	Orig   string `json:"orig"`
+	ID     string `json:"ID"`
+}
+
 func Shotifier(box *map[string]string, orig string) (string, bool, error) {
 	hash := md5.Sum([]byte(orig))
 	stringified := hex.EncodeToString(hash[:])

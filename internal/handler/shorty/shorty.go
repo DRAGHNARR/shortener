@@ -79,7 +79,12 @@ func (h *Shorty) PostPlain(c echo.Context) error {
 		return err
 	}
 
-	shorty, err := h.storage.Append(string(orig))
+	auth, err := c.Request().Cookie("url-auth")
+	if err != nil {
+		return err
+	}
+
+	shorty, err := h.storage.Append(string(orig), auth.Value)
 	if err != nil {
 		return err
 	}
@@ -93,7 +98,12 @@ func (h *Shorty) PostJSON(c echo.Context) error {
 		return err
 	}
 
-	shorty, err := h.storage.Append(m.URL)
+	auth, err := c.Request().Cookie("url-auth")
+	if err != nil {
+		return err
+	}
+
+	shorty, err := h.storage.Append(m.URL, auth.Value)
 	if err != nil {
 		return err
 	}
@@ -133,6 +143,24 @@ func (h *Shorty) Get(c echo.Context) error {
 		c.Response().Header().Set(echo.HeaderContentType, echo.MIMETextPlain)
 		return h.GetPlain(c)
 	}
+}
+
+func (h *Shorty) GetByUser(c echo.Context) error {
+	auth, err := c.Request().Cookie("url-auth")
+	if err != nil {
+		return err
+	}
+
+	if data := h.storage.GetByUser(auth.Value); len(data) != 0 {
+		body, err := json.Marshal(data)
+		if err != nil {
+			return err
+		}
+
+		return c.JSONBlob(http.StatusOK, body)
+	}
+
+	return c.NoContent(http.StatusNoContent)
 }
 
 func (h *Shorty) Post(c echo.Context) error {

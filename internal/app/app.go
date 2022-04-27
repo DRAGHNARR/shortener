@@ -5,7 +5,8 @@ import (
 	"log"
 	"net/http"
 	"os"
-	
+	"shortener/internal/handler/auth"
+
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 
@@ -63,6 +64,7 @@ func App() {
 	e := echo.New()
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
+	e.Use(auth.Check())
 	e.Use(zippo.ZippoReader())
 	e.Use(zippo.ZippoWriter())
 	e.HTTPErrorHandler = catcher.New().Catch
@@ -71,6 +73,7 @@ func App() {
 	e.POST("/", h.Post)
 	e.GET("/api/shorten", h.Get)
 	e.POST("/api/shorten", h.Post)
+	e.GET("/api/user/urls", h.GetByUser)
 
 	if err := e.Start(c.addr); err != http.ErrServerClosed {
 		log.Fatalf("err> %s", err.Error())

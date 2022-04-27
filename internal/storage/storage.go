@@ -11,23 +11,25 @@ import (
 	"shortener/internal/utils"
 )
 
-type Node struct {
-	Shorty string `json:"shorty"`
-	Orig   string `json:"orig"`
-}
-
 type option func(s *Storage) error
 
 type Storage struct {
 	Box      map[string]string
+	UserBox  map[string]map[string]struct{}
 	BoxMutex sync.RWMutex
 	File     *os.File
 	writer   *bufio.Writer
 }
 
+type ByUser struct {
+	Orig   string `json:"original_url"`
+	Shorty string `json:"short_url"`
+}
+
 func New(opts ...option) *Storage {
 	s := &Storage{
 		Box:      map[string]string{},
+		UserBox:  map[string]map[string]struct{}{},
 		BoxMutex: sync.RWMutex{},
 	}
 
@@ -57,7 +59,7 @@ func WithFile(filename string) option {
 		}()
 
 		scanner := bufio.NewScanner(file)
-		n := &Node{}
+		n := &utils.Node{}
 
 		for scanner.Scan() {
 			if err := json.Unmarshal(scanner.Bytes(), n); err != nil {
@@ -74,7 +76,7 @@ func WithFile(filename string) option {
 }
 
 func (s *Storage) store(orig, shorty string) error {
-	n := &Node{
+	n := &utils.Node{
 		Orig:   orig,
 		Shorty: shorty,
 	}
@@ -95,7 +97,7 @@ func (s *Storage) store(orig, shorty string) error {
 	return nil
 }
 
-func (s *Storage) Append(orig string) (string, error) {
+func (s *Storage) Append(orig, ID string) (string, error) {
 	s.BoxMutex.Lock()
 	defer func() {
 		s.BoxMutex.Unlock()
@@ -105,6 +107,11 @@ func (s *Storage) Append(orig string) (string, error) {
 	if err != nil {
 		return "", err
 	}
+
+	if _, ok := s.UserBox[ID]; !ok {
+		s.UserBox[ID] = map[string]struct{}{}
+	}
+	s.UserBox[ID][shorty] = struct{}{}
 
 	if added && s.File != nil {
 		if err := s.store(orig, shorty); err != nil {
@@ -122,6 +129,28 @@ func (s *Storage) Get(shorty string) (string, bool) {
 
 	orig, ok := s.Box[shorty]
 	return orig, ok
+}
+
+func (s *Storage) GetByUser(ID string) []ByUser {
+	s.BoxMutex.RLock()
+	defer func() {
+		s.BoxMutex.RUnlock()
+	}()
+
+	byUser := make([]ByUser, 0)
+	if shortyMap, ok := s.UserBox[ID]; ok {
+		fmt.Println(shortyMap)
+		for shorty, _ := range shortyMap {
+			if orig, ok := s.Box[shorty]; ok {
+				byUser = append(byUser, ByUser{
+					Orig:   orig,
+					Shorty: shorty,
+				})
+			}
+		}
+	}
+
+	return byUser
 }
 
 func (s *Storage) Close() error {
