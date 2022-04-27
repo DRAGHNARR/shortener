@@ -1,11 +1,14 @@
 package shorty
 
 import (
+	"context"
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"io"
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/labstack/echo/v4"
 
@@ -21,6 +24,7 @@ type option func(h *Shorty) error
 
 type Shorty struct {
 	storage *storage.Storage
+	db      *sql.DB
 	base    string
 }
 
@@ -42,6 +46,13 @@ func New(s *storage.Storage, opts ...option) *Shorty {
 func WithBase(base string) option {
 	return func(h *Shorty) error {
 		h.base = base
+		return nil
+	}
+}
+
+func WithDBase(db *sql.DB) option {
+	return func(h *Shorty) error {
+		h.db = db
 		return nil
 	}
 }
@@ -143,6 +154,15 @@ func (h *Shorty) Get(c echo.Context) error {
 		c.Response().Header().Set(echo.HeaderContentType, echo.MIMETextPlain)
 		return h.GetPlain(c)
 	}
+}
+
+func (h *Shorty) DBPing(c echo.Context) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
+	defer cancel()
+	if err := h.db.PingContext(ctx); err != nil {
+		return c.NoContent(http.StatusInternalServerError)
+	}
+	return c.NoContent(http.StatusOK)
 }
 
 func (h *Shorty) GetByUser(c echo.Context) error {
