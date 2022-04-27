@@ -144,7 +144,7 @@ func (s *Storage) GetByUser(ID string) []ByUser {
 			if orig, ok := s.Box[shorty]; ok {
 				byUser = append(byUser, ByUser{
 					Orig:   orig,
-					Shorty: shorty,
+					Shorty: fmt.Sprintf("http://localhost:8080/%s", shorty),
 				})
 			}
 		}
