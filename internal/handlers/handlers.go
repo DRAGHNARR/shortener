@@ -8,7 +8,7 @@ import (
 type Storage interface {
 	Push(string, string) (string, error)
 	Get(string) (string, bool)
-	Users(string, string) []storage.Users
+	Users(string, string) ([]storage.Users, error)
 	Ping(context.Context) error
 }
 

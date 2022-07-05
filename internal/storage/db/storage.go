@@ -71,7 +71,7 @@ func (st *Storage) Get(short string) (string, bool) {
 	return uri, true
 }
 
-func (st *Storage) Users(base, hash string) []storage.Users {
+func (st *Storage) Users(base, hash string) ([]storage.Users, error) {
 	u := make([]storage.Users, 0)
 	rows, err := st.db.Query(`
 		select uri, short
@@ -83,23 +83,25 @@ func (st *Storage) Users(base, hash string) []storage.Users {
 		where hash = $1
 	`, hash)
 	if err != nil {
-		log.Println(err)
-		return u
+		return nil, err
 	}
 	for rows.Next() {
 		var uri, short string
 		err := rows.Scan(&uri, &short)
 		if err != nil {
 			log.Println(err)
-			continue
+			return nil, err
 		}
 		u = append(u, storage.Users{
 			URI:   uri,
 			Short: fmt.Sprintf("%s/%s", base, short),
 		})
 	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
 
-	return u
+	return u, nil
 }
 
 func (st *Storage) Push(uri, hash string) (string, error) {

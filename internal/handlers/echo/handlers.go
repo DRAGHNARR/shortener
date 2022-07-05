@@ -211,12 +211,16 @@ func (h *Handler) User(c echo.Context) error {
 		return err
 	}
 
-	if data := h.st.Users(h.base, auth.Value); len(data) != 0 {
-		body, err := json.Marshal(data)
-		if err != nil {
-			return err
-		}
+	data, err := h.st.Users(h.base, auth.Value)
+	if err != nil {
+		return err
+	}
+	body, err := json.Marshal(data)
+	if err != nil {
+		return err
+	}
 
+	if len(data) != 0 {
 		return c.JSONBlob(http.StatusOK, body)
 	}
 

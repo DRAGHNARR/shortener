@@ -111,7 +111,7 @@ func (st *Storage) Get(short string) (string, bool) {
 	return uri, ok
 }
 
-func (st *Storage) Users(base, hash string) []storage.Users {
+func (st *Storage) Users(base, hash string) ([]storage.Users, error) {
 	st.usersMutex.RLock()
 	defer st.usersMutex.RUnlock()
 
@@ -127,7 +127,7 @@ func (st *Storage) Users(base, hash string) []storage.Users {
 		}
 	}
 
-	return u
+	return u, nil
 }
 
 func (st *Storage) Push(uri, hash string) (string, error) {

@@ -91,7 +91,6 @@ func App() {
 	}
 
 	e := echo.New()
-	e.GET("/ping", h.Ping)
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
 	e.Use(auth.Check())
@@ -105,6 +104,7 @@ func App() {
 	e.POST("/api/shorten", h.Post)
 	e.POST("/api/shorten/batch", h.Batch)
 	e.GET("/api/user/urls", h.User)
+	e.GET("/ping", h.Ping)
 
 	if err := e.Start(c.addr); err != http.ErrServerClosed {
 		log.Fatalf("err> %s", err.Error())
