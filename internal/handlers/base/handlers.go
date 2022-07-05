@@ -5,15 +5,11 @@ import (
 	"io"
 	"log"
 	"net/http"
-	"shortener/internal/handlers"
 
 	"github.com/labstack/echo/v4"
-)
 
-/*
-	POST uri/ 201-400
-	GET uri/{id} 307-400
-*/
+	"shortener/internal/handlers"
+)
 
 type Handler struct {
 	s    handlers.Storage

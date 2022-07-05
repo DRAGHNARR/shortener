@@ -7,9 +7,10 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"sync"
+
 	"shortener/internal/storage"
 	"shortener/internal/utils"
-	"sync"
 )
 
 type Storage struct {

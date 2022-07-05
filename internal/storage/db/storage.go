@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
+
 	"shortener/internal/storage"
 	"shortener/internal/utils"
 )
@@ -18,7 +19,7 @@ func (st *Storage) init() error {
 		create table if not exists uris (
 			id serial,
 			short varchar(7) not null,
-			uri varchar(64) not null
+			uri varchar(200) not null
 		)
 	`); err != nil {
 		return err

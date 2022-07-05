@@ -4,19 +4,20 @@ import (
 	"database/sql"
 	"flag"
 	"fmt"
-	"github.com/labstack/echo/v4"
-	"github.com/labstack/echo/v4/middleware"
-	_ "github.com/lib/pq"
 	"log"
 	"net/http"
 	"os"
-	eb "shortener/internal/handlers/echo"
-	stb "shortener/internal/storage/base"
-	db2 "shortener/internal/storage/db"
 
+	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
+	_ "github.com/lib/pq"
+
+	eb "shortener/internal/handlers/echo"
 	"shortener/internal/handlers/echo/middlewares/auth"
 	"shortener/internal/handlers/echo/middlewares/catcher"
 	"shortener/internal/handlers/echo/middlewares/zippo"
+	stb "shortener/internal/storage/base"
+	db2 "shortener/internal/storage/db"
 )
 
 type config struct {
