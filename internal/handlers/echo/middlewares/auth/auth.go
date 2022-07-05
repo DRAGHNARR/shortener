@@ -34,7 +34,7 @@ func Verify(key []byte, hash string) bool {
 func Check() echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
-			auth, err := c.Request().Cookie("url-auth")
+			auth, err := c.Request().Cookie("uri-auth")
 			if err != nil || !Verify(key, auth.Value) {
 				token := make([]byte, 4)
 				if _, err := rand.Read(token); err != nil {
@@ -42,10 +42,11 @@ func Check() echo.MiddlewareFunc {
 				}
 
 				cookie := new(http.Cookie)
-				cookie.Name = "url-auth"
+				cookie.Name = "uri-auth"
 				cookie.Value = Sign(key, token)
 				cookie.Expires = time.Now().Add(7 * 24 * time.Hour)
 				cookie.Path = "/"
+				cookie.Secure = false
 				c.Request().AddCookie(cookie)
 				c.SetCookie(cookie)
 				return next(c)

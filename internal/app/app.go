@@ -3,18 +3,20 @@ package app
 import (
 	"database/sql"
 	"flag"
+	"fmt"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	_ "github.com/lib/pq"
 	"log"
 	"net/http"
 	"os"
-	"shortener/internal/handler/auth"
+	eb "shortener/internal/handlers/echo"
+	stb "shortener/internal/storage/base"
+	db2 "shortener/internal/storage/db"
 
-	"shortener/internal/handler/catcher"
-	"shortener/internal/handler/shorty"
-	"shortener/internal/handler/zippo"
-	"shortener/internal/storage"
+	"shortener/internal/handlers/echo/middlewares/auth"
+	"shortener/internal/handlers/echo/middlewares/catcher"
+	"shortener/internal/handlers/echo/middlewares/zippo"
 )
 
 type config struct {
@@ -41,6 +43,7 @@ func App() {
 	flag.StringVar(&c.store, "f", store, "data storage")
 
 	base, ok := os.LookupEnv("BASE_URL")
+	fmt.Println(c.base, base)
 	if !ok {
 		base = "http://localhost:8080"
 	}
@@ -50,37 +53,45 @@ func App() {
 	if !ok {
 		dsn = ""
 	}
-	flag.StringVar(&c.dsn, "d", dsn, "base part of url")
+	flag.StringVar(&c.dsn, "d", dsn, "db dsn")
 	flag.Parse()
 
+	var h *eb.Handler
+	// "postgresql://postgres:postgres@localhost?sslmode=disable"
 	db, err := sql.Open("postgres", c.dsn)
 	if err != nil {
-		log.Fatalln(err)
-	}
-	defer func() {
-		if err := db.Close(); err != nil {
-			log.Fatalln(err)
-		}
-	}()
-
-	s := storage.New(
-		storage.WithFile(c.store),
-	)
-	defer func() {
-		if s.File != nil {
-			if err := s.File.Close(); err != nil {
-				log.Printf("unexpected error: %s", err.Error())
+		log.Println(err)
+	} else {
+		defer func() {
+			if err := db.Close(); err != nil {
+				log.Fatalln(err)
+			}
+		}()
+		if dbst, err := db2.New(db); err != nil {
+			log.Println(err)
+		} else {
+			if h, err = eb.New(dbst, eb.WithBase(c.base)); err != nil {
+				log.Println(err)
 			}
 		}
-	}()
+	}
 
-	h := shorty.New(
-		s,
-		shorty.WithBase(c.base),
-		shorty.WithDBase(db),
-	)
+	if h == nil {
+		bst := stb.New(stb.WithFile(c.store))
+		if h, err = eb.New(bst, eb.WithBase(c.base)); err != nil {
+			log.Fatalln(err)
+		}
+		defer func() {
+			if bst.File != nil {
+				if err := bst.File.Close(); err != nil {
+					log.Printf("unexpected error: %s", err.Error())
+				}
+			}
+		}()
+	}
 
 	e := echo.New()
+	e.GET("/ping", h.Ping)
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
 	e.Use(auth.Check())
@@ -92,8 +103,8 @@ func App() {
 	e.POST("/", h.Post)
 	e.GET("/api/shorten", h.Get)
 	e.POST("/api/shorten", h.Post)
-	e.GET("/api/user/urls", h.GetByUser)
-	e.GET("/ping", h.DBPing)
+	e.POST("/api/shorten/batch", h.Batch)
+	e.GET("/api/user/urls", h.User)
 
 	if err := e.Start(c.addr); err != http.ErrServerClosed {
 		log.Fatalf("err> %s", err.Error())
