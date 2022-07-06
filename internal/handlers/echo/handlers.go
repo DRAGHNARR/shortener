@@ -100,6 +100,7 @@ func (h *Handler) PostPlain(c echo.Context) error {
 		return err
 	}
 	auth, err := c.Request().Cookie("uri-auth")
+	fmt.Println(">>>>>", auth, err)
 	if err != nil {
 		return err
 	}
