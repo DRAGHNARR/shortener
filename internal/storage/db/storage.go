@@ -3,8 +3,11 @@ package db
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"fmt"
 	"log"
+
+	"github.com/jackc/pgerrcode"
 
 	"shortener/internal/storage"
 	"shortener/internal/utils"
@@ -139,30 +142,23 @@ func (st *Storage) Push(uri, hash string) (string, error) {
 	}
 
 	var uriid sql.NullInt64
+	if _, err := st.db.Exec(`
+		insert into uris (short, uri) 
+		values ($1, $2);
+	`, short, uri); errors.As(err, pgerrcode.UniqueViolation) {
+		log.Println("insert uri", err)
+		return short, err
+	} else if err != nil {
+		log.Println("insert uri", err)
+		return "", err
+	}
 	if err := st.db.QueryRow(`
 		select id
 		from uris
 		where uri = $1
-	`, uri).Scan(&uriid); err != nil && err != sql.ErrNoRows {
+	`, uri).Scan(&uriid); err != nil {
 		log.Println("select uri id", err)
 		return "", err
-	}
-	if !uriid.Valid {
-		if _, err := st.db.Exec(`
-			insert into uris (short, uri) 
-			values ($1, $2);
-		`, short, uri); err != nil {
-			log.Println("insert uri", err)
-			return "", err
-		}
-		if err := st.db.QueryRow(`
-			select id
-			from uris
-			where uri = $1
-		`, uri).Scan(&uriid); err != nil {
-			log.Println("select uri id", err)
-			return "", err
-		}
 	}
 
 	if err := st.db.QueryRow(`

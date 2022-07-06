@@ -3,7 +3,9 @@ package echo
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
+	"github.com/jackc/pgerrcode"
 	"github.com/labstack/echo/v4"
 	"io"
 	"net/http"
@@ -102,12 +104,18 @@ func (h *Handler) PostPlain(c echo.Context) error {
 		return err
 	}
 
+	status := http.StatusCreated
 	shorty, err := h.st.Push(string(orig), auth.Value)
+	if errors.As(err, pgerrcode.UniqueViolation) {
+		status = http.StatusConflict
+	} else if err != nil {
+		return err
+	}
 	if err != nil {
 		return err
 	}
 
-	return c.String(http.StatusCreated, fmt.Sprintf("%s/%s", h.base, shorty))
+	return c.String(status, fmt.Sprintf("%s/%s", h.base, shorty))
 }
 
 func (h *Handler) PostJSON(c echo.Context) error {
@@ -121,8 +129,11 @@ func (h *Handler) PostJSON(c echo.Context) error {
 		return err
 	}
 
+	status := http.StatusCreated
 	shorty, err := h.st.Push(m.URL, auth.Value)
-	if err != nil {
+	if errors.As(err, pgerrcode.UniqueViolation) {
+		status = http.StatusConflict
+	} else if err != nil {
 		return err
 	}
 
@@ -134,7 +145,7 @@ func (h *Handler) PostJSON(c echo.Context) error {
 		return err
 	}
 
-	return c.JSONBlob(http.StatusCreated, body)
+	return c.JSONBlob(status, body)
 }
 
 func (h *Handler) Post(c echo.Context) error {
