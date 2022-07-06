@@ -24,7 +24,7 @@ func (st *Storage) init() error {
 			short varchar(7) not null,
 			uri varchar(128) not null
 		);
-		create unique index uri on uris(short);
+		create unique index if not exists uri on uris(short);
 	`); err != nil {
 		return err
 	}
