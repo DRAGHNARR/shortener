@@ -118,7 +118,7 @@ func (st *Storage) Users(base, hash string) ([]storage.Users, error) {
 
 	u := make([]storage.Users, 0)
 	if shortMap, ok := st.users[hash]; ok {
-		for short, _ := range shortMap {
+		for short := range shortMap {
 			if uri, ok := st.uris[short]; ok {
 				u = append(u, storage.Users{
 					URI:   uri,
