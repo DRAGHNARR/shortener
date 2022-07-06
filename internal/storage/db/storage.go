@@ -23,7 +23,8 @@ func (st *Storage) init() error {
 			id serial,
 			short varchar(7) not null,
 			uri varchar(128) not null
-		)
+		);
+		create unique index uri on uris(short);
 	`); err != nil {
 		return err
 	}
