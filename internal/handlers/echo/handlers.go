@@ -3,10 +3,10 @@ package echo
 import (
 	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"github.com/jackc/pgerrcode"
 	"github.com/labstack/echo/v4"
+	"github.com/lib/pq"
 	"io"
 	"net/http"
 	"shortener/internal/handlers"
@@ -106,8 +106,10 @@ func (h *Handler) PostPlain(c echo.Context) error {
 
 	status := http.StatusCreated
 	shorty, err := h.st.Push(string(orig), auth.Value)
-	if errors.As(err, pgerrcode.UniqueViolation) {
-		status = http.StatusConflict
+	if pgErr, ok := err.(*pq.Error); ok {
+		if pgErr.Code == pgerrcode.UniqueViolation {
+			status = http.StatusConflict
+		}
 	} else if err != nil {
 		return err
 	}
@@ -131,8 +133,10 @@ func (h *Handler) PostJSON(c echo.Context) error {
 
 	status := http.StatusCreated
 	shorty, err := h.st.Push(m.URL, auth.Value)
-	if errors.As(err, pgerrcode.UniqueViolation) {
-		status = http.StatusConflict
+	if pgErr, ok := err.(*pq.Error); ok {
+		if pgErr.Code == pgerrcode.UniqueViolation {
+			status = http.StatusConflict
+		}
 	} else if err != nil {
 		return err
 	}

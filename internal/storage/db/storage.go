@@ -3,8 +3,8 @@ package db
 import (
 	"context"
 	"database/sql"
-	"errors"
 	"fmt"
+	"github.com/lib/pq"
 	"log"
 
 	"github.com/jackc/pgerrcode"
@@ -146,7 +146,7 @@ func (st *Storage) Push(uri, hash string) (string, error) {
 	if _, err := st.db.Exec(`
 		insert into uris (short, uri) 
 		values ($1, $2);
-	`, short, uri); errors.As(err, pgerrcode.UniqueViolation) {
+	`, short, uri); err.(*pq.Error).Code == pgerrcode.UniqueViolation {
 		log.Println("insert uri", err)
 		return short, err
 	} else if err != nil {
