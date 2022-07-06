@@ -19,7 +19,7 @@ func (st *Storage) init() error {
 		create table if not exists uris (
 			id serial,
 			short varchar(7) not null,
-			uri varchar(200) not null
+			uri varchar(128) not null
 		)
 	`); err != nil {
 		return err
@@ -27,7 +27,7 @@ func (st *Storage) init() error {
 	if _, err := st.db.Exec(`
 		create table if not exists users (
 			id serial,
-			hash varchar(64) 
+			hash varchar(128) 
 		)
 	`); err != nil {
 		return err
