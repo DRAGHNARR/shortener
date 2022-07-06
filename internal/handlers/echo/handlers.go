@@ -106,14 +106,9 @@ func (h *Handler) PostPlain(c echo.Context) error {
 
 	status := http.StatusCreated
 	shorty, err := h.st.Push(string(orig), auth.Value)
-	if pgErr, ok := err.(*pq.Error); ok {
-		if pgErr.Code == pgerrcode.UniqueViolation {
-			status = http.StatusConflict
-		}
+	if pgErr, ok := err.(*pq.Error); ok && pgErr.Code == pgerrcode.UniqueViolation {
+		status = http.StatusConflict
 	} else if err != nil {
-		return err
-	}
-	if err != nil {
 		return err
 	}
 
