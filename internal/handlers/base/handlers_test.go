@@ -1,4 +1,4 @@
-package handlers
+package base
 
 import (
 	"fmt"
@@ -10,7 +10,6 @@ import (
 	"strings"
 	"testing"
 
-	hb "shortener/internal/handlers/base"
 	sb "shortener/internal/storage/base"
 )
 
@@ -49,7 +48,7 @@ func TestHandlerGet(t *testing.T) {
 		},
 	}
 
-	h, err := hb.New(st, hb.WithBase("http://localhost:8080"))
+	h, err := New(st, WithBase("http://localhost:8080"))
 	if err != nil {
 		log.Fatalf("err:> unexpected error (h New): %s", err.Error())
 	}
@@ -109,7 +108,7 @@ func TestHandlerPost(t *testing.T) {
 	}
 
 	st := sb.New()
-	h, err := hb.New(st, hb.WithBase("http://localhost:8080"))
+	h, err := New(st, WithBase("http://localhost:8080"))
 	if err != nil {
 		log.Fatalf("err:> unexpected error (h New): %s", err.Error())
 	}
@@ -156,7 +155,7 @@ func TestHandlerUnexpectedMethod(t *testing.T) {
 	}
 
 	st := sb.New()
-	h, err := hb.New(st, hb.WithBase("http://localhost:8080"))
+	h, err := New(st, WithBase("http://localhost:8080"))
 	if err != nil {
 		log.Fatalf("err:> unexpected error (h New): %s", err.Error())
 	}
