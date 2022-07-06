@@ -133,10 +133,8 @@ func (h *Handler) PostJSON(c echo.Context) error {
 
 	status := http.StatusCreated
 	shorty, err := h.st.Push(m.URL, auth.Value)
-	if pgErr, ok := err.(*pq.Error); ok {
-		if pgErr.Code == pgerrcode.UniqueViolation {
-			status = http.StatusConflict
-		}
+	if pgErr, ok := err.(*pq.Error); ok && pgErr.Code == pgerrcode.UniqueViolation {
+		status = http.StatusConflict
 	} else if err != nil {
 		return err
 	}
@@ -201,7 +199,9 @@ func (h Handler) Batch(c echo.Context) error {
 		for _, m := range mm {
 			short, err := h.st.Push(m.URI, auth.Value)
 			if err != nil {
-				return err
+				if pgErr, ok := err.(*pq.Error); !ok || pgErr.Code != pgerrcode.UniqueViolation {
+					return err
+				}
 			}
 			m.Short = fmt.Sprintf("%s/%s", h.base, short)
 			m.URI = ""

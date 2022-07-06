@@ -146,7 +146,7 @@ func (st *Storage) Push(uri, hash string) (string, error) {
 	if _, err := st.db.Exec(`
 		insert into uris (short, uri) 
 		values ($1, $2);
-	`, short, uri); err.(*pq.Error).Code == pgerrcode.UniqueViolation {
+	`, short, uri); err != nil && err.(*pq.Error).Code == pgerrcode.UniqueViolation {
 		log.Println("insert uri", err)
 		return short, err
 	} else if err != nil {
