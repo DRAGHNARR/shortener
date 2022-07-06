@@ -121,10 +121,10 @@ func (st *Storage) Push(uri, hash string) (string, error) {
 		return "", err
 	}
 	if !userid.Valid {
-		if err := st.db.QueryRow(`
+		if _, err := st.db.Exec(`
 			insert into users (hash) 
 			values ($1);
-		`, hash).Scan(&userid); err != nil {
+		`, hash); err != nil {
 			log.Println("insert user", err)
 			return "", err
 		}
