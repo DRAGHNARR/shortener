@@ -196,6 +196,9 @@ func (st *Storage) Batch(mm []*handlers.Batch) error {
 		insert into uris (short, uri) 
 		values (?, ?);
 	`)
+	if err != nil {
+		return err
+	}
 	defer func() {
 		if err := stmt.Close(); err != nil {
 			log.Fatalf("warn:> unexpected error on closing stmt: %s\n", err.Error())
