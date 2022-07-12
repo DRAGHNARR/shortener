@@ -2,6 +2,7 @@ package app
 
 import (
 	"database/sql"
+	"fmt"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	_ "github.com/lib/pq"
@@ -20,6 +21,7 @@ import (
 
 func App() {
 	c, err := config.New()
+	fmt.Println(c.Addr)
 	if err != nil {
 		log.Fatalf("err:> unable to initialize config: %s\n", err.Error())
 	}

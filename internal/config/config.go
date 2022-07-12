@@ -6,8 +6,8 @@ import (
 )
 
 type Config struct {
-	Addr    string `env:"SERVER_ADDRESS" envDefault:"http://localhost:8080"`
-	BaseURI string `env:"BASE_URL" envDefault:"localhost:8080"`
+	Addr    string `env:"SERVER_ADDRESS" envDefault:"localhost:8080"`
+	BaseURI string `env:"BASE_URL" envDefault:"http://localhost:8080"`
 	Store   string `env:"FILE_STORAGE_PATH" envDefault:"test.json"`
 	DSN     string `env:"DATABASE_DSN"`
 }
