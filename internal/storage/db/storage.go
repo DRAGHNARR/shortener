@@ -194,7 +194,7 @@ func (st *Storage) Batch(mm []*handlers.Batch) error {
 
 	stmt, err := tx.Prepare(`
 		insert into uris (short, uri) 
-		values (?, ?);
+		values ($1, $2);
 	`)
 	if err != nil {
 		return err
