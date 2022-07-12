@@ -12,9 +12,11 @@ type Config struct {
 	DSN     string `env:"DATABASE_DSN"`
 }
 
-func New() *Config {
+func New() (*Config, error) {
 	c := &Config{}
-	env.Parse(&c)
+	if err := env.Parse(c); err != nil {
+		return nil, err
+	}
 
 	flag.StringVar(&c.Addr, "a", c.Addr, "host")
 	flag.StringVar(&c.Store, "f", c.Store, "data storage")
@@ -22,5 +24,5 @@ func New() *Config {
 	flag.StringVar(&c.DSN, "d", c.DSN, "db dsn")
 	flag.Parse()
 
-	return c
+	return c, nil
 }

@@ -19,7 +19,10 @@ import (
 )
 
 func App() {
-	c := config.New()
+	c, err := config.New()
+	if err != nil {
+		log.Fatalf("err:> unable to initialize config: %s\n", err.Error())
+	}
 
 	var st handlersInterface.Storage
 	// "postgresql://postgres:postgres@localhost?sslmode=disable"
