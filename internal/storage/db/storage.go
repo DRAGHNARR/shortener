@@ -188,7 +188,7 @@ func (st *Storage) Batch(mm []*handlers.Batch) error {
 	}
 	defer func() {
 		if err := tx.Rollback(); err != nil {
-			log.Fatalf("warn:> unexpected error on rollback tx: %s\n", err.Error())
+			log.Printf("warn:> unexpected error on rollback tx: %s\n", err.Error())
 		}
 	}()
 
@@ -215,6 +215,7 @@ func (st *Storage) Batch(mm []*handlers.Batch) error {
 			return err
 		}
 	}
+	fmt.Println(mm)
 
 	return tx.Commit()
 }
