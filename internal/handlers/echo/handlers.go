@@ -187,21 +187,8 @@ func (h Handler) Batch(c echo.Context) error {
 			return err
 		}
 
-		auth, err := c.Request().Cookie("uri-auth")
-		if err != nil {
+		if err := h.st.Batch(mm); err != nil {
 			return err
-		}
-
-		for _, m := range mm {
-			short, err := h.st.Push(m.URI, auth.Value)
-			if err != nil {
-				if pgErr, ok := err.(*pq.Error); !ok || pgErr.Code != pgerrcode.UniqueViolation {
-					return err
-				}
-			}
-			m.Short = fmt.Sprintf("%s/%s", h.base, short)
-			m.URI = ""
-			fmt.Println(m)
 		}
 
 		body, err := json.Marshal(mm)

@@ -9,16 +9,17 @@ import (
 
 	"github.com/jackc/pgerrcode"
 
+	"shortener/internal/handlers"
 	"shortener/internal/storage"
 	"shortener/internal/utils"
 )
 
 type Storage struct {
-	db *sql.DB
+	DB *sql.DB
 }
 
 func (st *Storage) init() error {
-	if _, err := st.db.Exec(`
+	if _, err := st.DB.Exec(`
 		create table if not exists uris (
 			id serial,
 			short varchar(7) not null,
@@ -28,7 +29,7 @@ func (st *Storage) init() error {
 	`); err != nil {
 		return err
 	}
-	if _, err := st.db.Exec(`
+	if _, err := st.DB.Exec(`
 		create table if not exists users (
 			id serial,
 			hash varchar(128) 
@@ -36,7 +37,7 @@ func (st *Storage) init() error {
 	`); err != nil {
 		return err
 	}
-	if _, err := st.db.Exec(`
+	if _, err := st.DB.Exec(`
 		create table if not exists uxu (
 			id serial,
 			uriid int,
@@ -50,7 +51,7 @@ func (st *Storage) init() error {
 
 func New(db *sql.DB) (*Storage, error) {
 	st := &Storage{
-		db: db,
+		DB: db,
 	}
 	if err := st.init(); err != nil {
 		return nil, err
@@ -59,12 +60,12 @@ func New(db *sql.DB) (*Storage, error) {
 }
 
 func (st *Storage) Ping(ctx context.Context) error {
-	return st.db.PingContext(ctx)
+	return st.DB.PingContext(ctx)
 }
 
 func (st *Storage) Get(short string) (string, bool) {
 	var uri string
-	err := st.db.QueryRow(`
+	err := st.DB.QueryRow(`
 		select uri
 		from uris t1
 		where t1.short = $1
@@ -78,7 +79,7 @@ func (st *Storage) Get(short string) (string, bool) {
 
 func (st *Storage) Users(base, hash string) ([]storage.Users, error) {
 	u := make([]storage.Users, 0)
-	rows, err := st.db.Query(`
+	rows, err := st.DB.Query(`
 		select uri, short
 		from uris t1
 		inner join uxu t2
@@ -116,7 +117,7 @@ func (st *Storage) Push(uri, hash string) (string, error) {
 	}
 
 	var userid sql.NullInt64
-	if err := st.db.QueryRow(`
+	if err := st.DB.QueryRow(`
 		select id
 		from users
 		where hash = $1
@@ -125,14 +126,14 @@ func (st *Storage) Push(uri, hash string) (string, error) {
 		return "", err
 	}
 	if !userid.Valid {
-		if _, err := st.db.Exec(`
+		if _, err := st.DB.Exec(`
 			insert into users (hash) 
 			values ($1);
 		`, hash); err != nil {
 			log.Println("insert user", err)
 			return "", err
 		}
-		if err := st.db.QueryRow(`
+		if err := st.DB.QueryRow(`
 			select id
 			from users
 			where hash = $1
@@ -143,7 +144,7 @@ func (st *Storage) Push(uri, hash string) (string, error) {
 	}
 
 	var uriid sql.NullInt64
-	if _, err := st.db.Exec(`
+	if _, err := st.DB.Exec(`
 		insert into uris (short, uri) 
 		values ($1, $2);
 	`, short, uri); err != nil && err.(*pq.Error).Code == pgerrcode.UniqueViolation {
@@ -153,7 +154,7 @@ func (st *Storage) Push(uri, hash string) (string, error) {
 		log.Println("insert uri", err)
 		return "", err
 	}
-	if err := st.db.QueryRow(`
+	if err := st.DB.QueryRow(`
 		select id
 		from uris
 		where uri = $1
@@ -162,13 +163,13 @@ func (st *Storage) Push(uri, hash string) (string, error) {
 		return "", err
 	}
 
-	if err := st.db.QueryRow(`
+	if err := st.DB.QueryRow(`
 		select id
 		from uxu
 		where uriid = $1
 		and userid = $2
 	`, uriid, userid).Scan(&uriid); err == sql.ErrNoRows {
-		if _, err := st.db.Exec(`
+		if _, err := st.DB.Exec(`
 			insert into uxu (uriid, userid)
 			values($1, $2)
 		`, uriid, userid); err != nil {
@@ -180,6 +181,36 @@ func (st *Storage) Push(uri, hash string) (string, error) {
 	return short, nil
 }
 
+func (st *Storage) Batch(mm []*handlers.Batch) error {
+	tx, err := st.DB.Begin()
+	if err != nil {
+		return err
+	}
+	defer func() {
+		if err := tx.Rollback(); err != nil {
+			log.Fatalf("warn:> unexpected error on rollback tx: %s\n", err.Error())
+		}
+	}()
+
+	stmt, err := tx.Prepare(`
+		insert into uris (short, uri) 
+		values (?, ?);
+	`)
+	defer func() {
+		if err := stmt.Close(); err != nil {
+			log.Fatalf("warn:> unexpected error on closing stmt: %s\n", err.Error())
+		}
+	}()
+
+	for _, m := range mm {
+		if _, err := stmt.Exec(m.Short, m.URI); err != nil {
+			return err
+		}
+	}
+
+	return tx.Commit()
+}
+
 func (st *Storage) Close() error {
-	return st.db.Close()
+	return st.DB.Close()
 }

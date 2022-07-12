@@ -9,6 +9,7 @@ import (
 	"os"
 	"sync"
 
+	"shortener/internal/handlers"
 	"shortener/internal/storage"
 	"shortener/internal/utils"
 )
@@ -154,6 +155,18 @@ func (st *Storage) Push(uri, hash string) (string, error) {
 	st.users[hash][short] = struct{}{}
 
 	return short, nil
+}
+
+func (st *Storage) Batch(mm []*handlers.Batch) error {
+	st.urisMutex.Lock()
+	defer st.urisMutex.Unlock()
+	for _, m := range mm {
+		if err := st.store(m.URI, m.Short); err != nil {
+			return err
+		}
+		st.uris[m.Short] = m.URI
+	}
+	return nil
 }
 
 func (st *Storage) Close() error {

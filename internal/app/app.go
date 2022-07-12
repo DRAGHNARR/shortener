@@ -10,7 +10,7 @@ import (
 	"net/http"
 	"shortener/internal/config"
 
-	handlersInterface "shortener/internal/handlers"
+	handlersInterfaces "shortener/internal/handlers"
 	echoHandlers "shortener/internal/handlers/echo"
 	"shortener/internal/handlers/echo/middlewares/auth"
 	"shortener/internal/handlers/echo/middlewares/catcher"
@@ -26,7 +26,7 @@ func App() {
 		log.Fatalf("err:> unable to initialize config: %s\n", err.Error())
 	}
 
-	var st handlersInterface.Storage
+	var st handlersInterfaces.Storage
 	// "postgresql://postgres:postgres@localhost?sslmode=disable"
 
 	if c.DSN != "" {
