@@ -188,7 +188,7 @@ func (h Handler) Batch(c echo.Context) error {
 		}
 
 		status := http.StatusCreated
-		err := h.st.Batch(mm)
+		err := h.st.Batch(h.base, mm)
 		if pgErr, ok := err.(*pq.Error); ok && pgErr.Code == pgerrcode.UniqueViolation {
 			status = http.StatusConflict
 		} else if err != nil {

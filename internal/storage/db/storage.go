@@ -181,7 +181,7 @@ func (st *Storage) Push(uri, hash string) (string, error) {
 	return short, nil
 }
 
-func (st *Storage) Batch(mm []*handlers.Batch) error {
+func (st *Storage) Batch(base string, mm []*handlers.Batch) error {
 	tx, err := st.DB.Begin()
 	if err != nil {
 		return err
@@ -210,8 +210,8 @@ func (st *Storage) Batch(mm []*handlers.Batch) error {
 		if err != nil {
 			return err
 		}
-		m.Short = short
-		if _, err := stmt.Exec(m.Short, m.URI); err != nil {
+		m.Short = fmt.Sprintf("%s/%s", base, short)
+		if _, err := stmt.Exec(short, m.URI); err != nil {
 			return err
 		}
 	}

@@ -11,7 +11,7 @@ type Storage interface {
 	Get(string) (string, bool)
 	Users(string, string) ([]storage.Users, error)
 	Ping(context.Context) error
-	Batch([]*Batch) error
+	Batch(string, []*Batch) error
 	Close() error
 }
 

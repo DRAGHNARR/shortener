@@ -157,7 +157,7 @@ func (st *Storage) Push(uri, hash string) (string, error) {
 	return short, nil
 }
 
-func (st *Storage) Batch(mm []*handlers.Batch) error {
+func (st *Storage) Batch(base string, mm []*handlers.Batch) error {
 	st.urisMutex.Lock()
 	defer st.urisMutex.Unlock()
 	for _, m := range mm {
@@ -165,8 +165,8 @@ func (st *Storage) Batch(mm []*handlers.Batch) error {
 		if err != nil {
 			return err
 		}
-		m.Short = short
-		if err := st.store(m.URI, m.Short); err != nil {
+		m.Short = fmt.Sprintf("%s/%s", base, short)
+		if err := st.store(m.URI, short); err != nil {
 			return err
 		}
 		st.uris[m.Short] = m.URI
