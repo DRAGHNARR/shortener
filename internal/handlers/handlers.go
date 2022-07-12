@@ -2,7 +2,7 @@ package handlers
 
 import (
 	"context"
-	
+
 	"shortener/internal/storage"
 )
 
@@ -11,11 +11,7 @@ type Storage interface {
 	Get(string) (string, bool)
 	Users(string, string) ([]storage.Users, error)
 	Ping(context.Context) error
-}
-
-type Handler struct {
-	s    Storage
-	base string
+	Close() error
 }
 
 type Message struct {

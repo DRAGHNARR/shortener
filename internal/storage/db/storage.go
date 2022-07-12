@@ -179,3 +179,7 @@ func (st *Storage) Push(uri, hash string) (string, error) {
 
 	return short, nil
 }
+
+func (st *Storage) Close() error {
+	return st.db.Close()
+}

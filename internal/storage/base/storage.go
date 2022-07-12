@@ -155,3 +155,10 @@ func (st *Storage) Push(uri, hash string) (string, error) {
 
 	return short, nil
 }
+
+func (st *Storage) Close() error {
+	if st.File != nil {
+		return st.File.Close()
+	}
+	return nil
+}
