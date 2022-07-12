@@ -187,7 +187,11 @@ func (h Handler) Batch(c echo.Context) error {
 			return err
 		}
 
-		if err := h.st.Batch(mm); err != nil {
+		status := http.StatusCreated
+		err := h.st.Batch(mm)
+		if pgErr, ok := err.(*pq.Error); ok && pgErr.Code == pgerrcode.UniqueViolation {
+			status = http.StatusConflict
+		} else if err != nil {
 			return err
 		}
 
@@ -196,7 +200,7 @@ func (h Handler) Batch(c echo.Context) error {
 			return err
 		}
 
-		return c.JSONBlob(http.StatusCreated, body)
+		return c.JSONBlob(status, body)
 
 	default:
 		return c.NoContent(http.StatusUnauthorized)

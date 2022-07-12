@@ -161,6 +161,11 @@ func (st *Storage) Batch(mm []*handlers.Batch) error {
 	st.urisMutex.Lock()
 	defer st.urisMutex.Unlock()
 	for _, m := range mm {
+		short, err := utils.Shorty(st, m.URI)
+		if err != nil {
+			return err
+		}
+		m.Short = short
 		if err := st.store(m.URI, m.Short); err != nil {
 			return err
 		}

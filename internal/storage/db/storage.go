@@ -206,6 +206,11 @@ func (st *Storage) Batch(mm []*handlers.Batch) error {
 	}()
 
 	for _, m := range mm {
+		short, err := utils.Shorty(st, m.URI)
+		if err != nil {
+			return err
+		}
+		m.Short = short
 		if _, err := stmt.Exec(m.Short, m.URI); err != nil {
 			return err
 		}
