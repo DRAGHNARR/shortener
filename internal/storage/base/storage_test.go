@@ -33,7 +33,7 @@ func TestStorage_AppendWithHolding(t *testing.T) {
 			shorty, err := st.Push(test.value, "test")
 			if assert.NoError(t, err, fmt.Sprintf("%s: error handled", test.name)) {
 				assert.Equal(t, test.want, shorty, fmt.Sprintf("%s: unexpected result", test.name))
-				assert.Equal(t, test.value, st.uris[shorty], fmt.Sprintf("%s: unexpected result", test.name))
+				assert.Equal(t, test.value, st.uris[shorty].URI, fmt.Sprintf("%s: unexpected result", test.name))
 			}
 		})
 	}
@@ -67,7 +67,7 @@ func TestStorage_AppendWithoutHolding(t *testing.T) {
 			shorty, err := st.Push(test.value, "test")
 			if assert.NoError(t, err, fmt.Sprintf("%s: error handled", test.name)) {
 				assert.Equal(t, test.want, shorty, fmt.Sprintf("%s: unexpected result", test.name))
-				assert.Equal(t, test.value, st.uris[shorty], fmt.Sprintf("%s: unexpected result", test.name))
+				assert.Equal(t, test.value, st.uris[shorty].URI, fmt.Sprintf("%s: unexpected result", test.name))
 			}
 		})
 	}
