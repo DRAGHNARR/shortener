@@ -240,7 +240,7 @@ func (h *Handler) DeleteURIsByList(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	shorts := make([]string, 0, 0)
+	shorts := make([]string, 0)
 	if err := json.NewDecoder(c.Request().Body).Decode(&shorts); err != nil {
 		return err
 	}
