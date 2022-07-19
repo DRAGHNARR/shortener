@@ -8,10 +8,11 @@ import (
 
 type Storage interface {
 	Push(string, string) (string, error)
-	Get(string) (string, bool)
+	Get(string) (*storage.URIsItem, bool)
 	Users(string, string) ([]storage.Users, error)
 	Ping(context.Context) error
 	Batch(string, []*Batch) error
+	MarkAsDeleted(string, string)
 	Close() error
 }
 

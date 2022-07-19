@@ -61,6 +61,7 @@ func App() {
 	e.Use(zippo.ZippoWriter())
 	e.HTTPErrorHandler = catcher.New().Catch
 
+	e.DELETE("/api/user/urls", h.DeleteURIsByList)
 	e.GET("/:url", h.Get)
 	e.POST("/", h.Post)
 	e.GET("/api/shorten", h.Get)

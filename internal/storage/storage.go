@@ -5,3 +5,8 @@ type Users struct {
 	Short string `json:"short_url"`
 	ID    string `json:"ID,omitempty"`
 }
+
+type URIsItem struct {
+	URI     string
+	Deleted bool
+}

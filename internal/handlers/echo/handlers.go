@@ -43,7 +43,10 @@ func New(s handlers.Storage, opts ...Options) (*Handler, error) {
 
 func (h *Handler) GetPlain(c echo.Context) error {
 	if orig, ok := h.st.Get(c.Param("url")); ok {
-		c.Response().Header().Set(echo.HeaderLocation, orig)
+		if orig.Deleted {
+			return c.NoContent(http.StatusGone)
+		}
+		c.Response().Header().Set(echo.HeaderLocation, orig.URI)
 		return c.NoContent(http.StatusTemporaryRedirect)
 	}
 
@@ -58,7 +61,10 @@ func (h *Handler) GetJSON(c echo.Context) error {
 
 	var a handlers.Message
 	if orig, ok := h.st.Get(m.URL); ok {
-		a.Result = orig
+		if orig.Deleted {
+			return c.NoContent(http.StatusGone)
+		}
+		a.Result = orig.URI
 		body, err := json.Marshal(a)
 		if err != nil {
 			return err
@@ -227,6 +233,22 @@ func (h *Handler) User(c echo.Context) error {
 	}
 
 	return c.NoContent(http.StatusNoContent)
+}
+
+func (h *Handler) DeleteURIsByList(c echo.Context) error {
+	auth, err := c.Request().Cookie("uri-auth")
+	if err != nil {
+		return err
+	}
+	shorts := make([]string, 0, 0)
+	if err := json.NewDecoder(c.Request().Body).Decode(&shorts); err != nil {
+		return err
+	}
+	fmt.Println(shorts)
+	for _, short := range shorts {
+		go h.st.MarkAsDeleted(auth.Value, short)
+	}
+	return c.NoContent(http.StatusAccepted)
 }
 
 func (h *Handler) Ping(c echo.Context) error {
