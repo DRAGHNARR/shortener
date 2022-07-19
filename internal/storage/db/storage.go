@@ -23,7 +23,8 @@ func (st *Storage) init() error {
 		create table if not exists uris (
 			id serial,
 			short varchar(7) not null,
-			uri varchar(128) not null
+			uri varchar(128) not null,
+		    deleted bool not null
 		);
 		create unique index if not exists uri on uris(short);
 	`); err != nil {
@@ -63,18 +64,27 @@ func (st *Storage) Ping(ctx context.Context) error {
 	return st.DB.PingContext(ctx)
 }
 
-func (st *Storage) Get(short string) (string, bool) {
-	var uri string
+func (st *Storage) Get(short string) (*storage.URIsItem, bool) {
+	var (
+		uri     string
+		deleted bool
+	)
 	err := st.DB.QueryRow(`
-		select uri
+		select uri, deleted
 		from uris t1
 		where t1.short = $1
-	`, short).Scan(&uri)
+	`, short).Scan(&uri, &deleted)
 	if err != nil {
 		log.Println(err)
-		return uri, false
+		return &storage.URIsItem{
+			URI:     uri,
+			Deleted: true,
+		}, false
 	}
-	return uri, true
+	return &storage.URIsItem{
+		URI:     uri,
+		Deleted: deleted,
+	}, true
 }
 
 func (st *Storage) Users(base, hash string) ([]storage.Users, error) {
@@ -145,8 +155,8 @@ func (st *Storage) Push(uri, hash string) (string, error) {
 
 	var uriid sql.NullInt64
 	if _, err := st.DB.Exec(`
-		insert into uris (short, uri) 
-		values ($1, $2);
+		insert into uris (short, uri, deleted) 
+		values ($1, $2, false);
 	`, short, uri); err != nil && err.(*pq.Error).Code == pgerrcode.UniqueViolation {
 		log.Println("insert uri", err)
 		return short, err
@@ -193,8 +203,8 @@ func (st *Storage) Batch(base string, mm []*handlers.Batch) error {
 	}()
 
 	stmt, err := tx.Prepare(`
-		insert into uris (short, uri) 
-		values ($1, $2);
+		insert into uris (short, uri, deleted) 
+		values ($1, $2, false) on conflict do nothing;
 	`)
 	if err != nil {
 		return err
@@ -215,9 +225,27 @@ func (st *Storage) Batch(base string, mm []*handlers.Batch) error {
 			return err
 		}
 	}
-	fmt.Println(mm)
 
 	return tx.Commit()
+}
+
+func (st *Storage) MarkAsDeleted(auth, short string) {
+	fmt.Println(auth)
+	if _, err := st.DB.Exec(`
+		update uris t1
+		set deleted = true
+		where short = $1
+		and exists (
+		    select 
+		    from uxu
+		    inner join users
+		    on uxu.userid = users.id
+		    where uxu.uriid = t1.id
+			and users.hash = $2
+		)
+	`, short, auth); err != nil {
+		log.Printf("warn:> unexpected error on update status: %s\n", err.Error())
+	}
 }
 
 func (st *Storage) Close() error {

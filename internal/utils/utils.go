@@ -4,10 +4,11 @@ import (
 	"crypto/md5"
 	"encoding/hex"
 	"fmt"
+	"shortener/internal/storage"
 )
 
 type Getty interface {
-	Get(string) (string, bool)
+	Get(string) (*storage.URIsItem, bool)
 }
 
 func Shorty(st Getty, uri string) (string, error) {
@@ -16,7 +17,7 @@ func Shorty(st Getty, uri string) (string, error) {
 
 	for i := 0; i < len(toShort)-7; i++ {
 		short := toShort[i : i+7]
-		if suri, ok := st.Get(short); !ok || suri == uri {
+		if suri, ok := st.Get(short); !ok || suri.URI == uri {
 			return short, nil
 		}
 	}

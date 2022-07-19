@@ -15,7 +15,7 @@ import (
 )
 
 type Storage struct {
-	uris      map[string]string
+	uris      map[string]*storage.URIsItem
 	urisMutex sync.RWMutex
 
 	users      map[string]map[string]struct{}
@@ -47,7 +47,10 @@ func WithFile(filename string) option {
 				return fmt.Errorf("cannot unmarshar stored data from File %s (%s), continue without holding", filename, err.Error())
 			}
 
-			s.uris[n.Short] = n.URI
+			s.uris[n.Short] = &storage.URIsItem{
+				URI:     n.URI,
+				Deleted: false,
+			}
 		}
 
 		s.File = file
@@ -58,7 +61,7 @@ func WithFile(filename string) option {
 
 func New(opts ...option) *Storage {
 	st := &Storage{
-		uris:      map[string]string{},
+		uris:      map[string]*storage.URIsItem{},
 		urisMutex: sync.RWMutex{},
 
 		users:      map[string]map[string]struct{}{},
@@ -104,9 +107,8 @@ func (st *Storage) Ping(ctx context.Context) error {
 	return nil
 }
 
-func (st *Storage) Get(short string) (string, bool) {
+func (st *Storage) Get(short string) (*storage.URIsItem, bool) {
 	st.urisMutex.RLock()
-	fmt.Println(st.uris)
 	defer st.urisMutex.RUnlock()
 
 	uri, ok := st.uris[short]
@@ -122,7 +124,7 @@ func (st *Storage) Users(base, hash string) ([]storage.Users, error) {
 		for short := range shortMap {
 			if uri, ok := st.uris[short]; ok {
 				u = append(u, storage.Users{
-					URI:   uri,
+					URI:   uri.URI,
 					Short: fmt.Sprintf("%s/%s", base, short),
 				})
 			}
@@ -145,7 +147,10 @@ func (st *Storage) Push(uri, hash string) (string, error) {
 			return "", err
 		}
 	}
-	st.uris[short] = uri
+	st.uris[short] = &storage.URIsItem{
+		URI:     uri,
+		Deleted: false,
+	}
 
 	st.usersMutex.Lock()
 	defer st.usersMutex.Unlock()
@@ -169,9 +174,25 @@ func (st *Storage) Batch(base string, mm []*handlers.Batch) error {
 		if err := st.store(m.URI, short); err != nil {
 			return err
 		}
-		st.uris[m.Short] = m.URI
+		st.uris[m.Short] = &storage.URIsItem{
+			URI:     m.URI,
+			Deleted: false,
+		}
 	}
 	return nil
+}
+
+func (st *Storage) MarkAsDeleted(auth, short string) {
+	st.usersMutex.RLock()
+	defer st.usersMutex.RUnlock()
+
+	if userURIs, ok := st.users[auth]; ok {
+		if _, ok := userURIs[short]; ok {
+			st.urisMutex.Lock()
+			defer st.urisMutex.Unlock()
+			st.uris[short].Deleted = true
+		}
+	}
 }
 
 func (st *Storage) Close() error {

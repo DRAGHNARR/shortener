@@ -64,7 +64,7 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 func (h *Handler) Get(w http.ResponseWriter, r *http.Request) {
 	short := r.URL.Path[1:]
 	if uri, ok := h.s.Get(short); ok {
-		w.Header().Set(echo.HeaderLocation, uri)
+		w.Header().Set(echo.HeaderLocation, uri.URI)
 		w.WriteHeader(http.StatusTemporaryRedirect)
 		if _, err := w.Write(nil); err != nil {
 			h.Error(w, err)
