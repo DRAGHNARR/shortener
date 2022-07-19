@@ -155,8 +155,8 @@ func (st *Storage) Push(uri, hash string) (string, error) {
 
 	var uriid sql.NullInt64
 	if _, err := st.DB.Exec(`
-		insert into uris (short, uri) 
-		values ($1, $2);
+		insert into uris (short, uri, deleted) 
+		values ($1, $2, false);
 	`, short, uri); err != nil && err.(*pq.Error).Code == pgerrcode.UniqueViolation {
 		log.Println("insert uri", err)
 		return short, err
